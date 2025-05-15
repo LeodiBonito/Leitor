@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F8F8F8"
+    android:padding="24dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="24dp"
+        android:elevation="4dp">
+
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gerar QR Code"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"
+            android:textColor="#000000" />
+
+        <EditText
+            android:id="@+id/editTextNomeEvento"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Nome do evento"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"
+            android:inputType="text"
+            android:textColor="#000000"/>
+
+        <EditText
+            android:id="@+id/editTextDataHoraInicio"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Data e hora de início (dd/mm/aaaa+hh:mm)"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"
+            android:inputType="datetime"
+            android:digits="0123456789/+:"
+            android:maxLength="16"
+            android:textColor="#000000"/>
+
+        <EditText
+            android:id="@+id/editTextDataHoraTermino"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Data e hora de término (dd/mm/aaaa+hh:mm)"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"
+            android:inputType="datetime"
+            android:digits="0123456789/+:"
+            android:maxLength="16"
+            android:textColor="#000000"/>
+
+        <EditText
+            android:id="@+id/editTextEndereco"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:hint="Endereço"
+            android:padding="12dp"
+            android:layout_marginBottom="12dp"
+            android:inputType="textPostalAddress"
+            android:textColor="#000000"/>
+
+        <EditText
+            android:id="@+id/editTextDescricao"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:hint="Descrição"
+            android:padding="12dp"
+            android:layout_marginBottom="16dp"
+            android:inputType="textMultiLine"
+            android:gravity="top"
+            android:textColor="#000000"/>
+
+        <Button
+            android:id="@+id/buttonGenerate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="GERAR QR CODE"
+            android:backgroundTint="#0066FF"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp" />
+
+        <ImageView
+            android:id="@+id/imageViewQRCode"
+            android:layout_width="250dp"
+            android:layout_height="250dp"
+            android:layout_gravity="center"
+            android:contentDescription="QR Code" />
+
+    </LinearLayout>
+</ScrollView>

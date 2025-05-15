@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#FFFFFF">
+
+    <!-- Cabeçalho -->
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:gravity="center"
+        android:text="EventQR"
+        android:textColor="#009688"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <!-- Botão Criar QRCode de Evento -->
+    <Button
+        android:id="@+id/btnUsuario"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="32dp"
+        android:backgroundTint="#0D6EFD"
+
+        android:text="Usuario"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        app:rippleColor="#0D6EFD" />
+
+    <Button
+        android:id="@+id/btnCriarEvento"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp"
+
+        android:backgroundTint="#0D6EFD"
+        android:text="Criar QRCode de Evento"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        app:rippleColor="#0D6EFD" />
+
+    <!-- Botão Escanear QRCode de Evento -->
+    <Button
+        android:id="@+id/btnEscanearEvento"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#0D6EFD"
+
+        android:text="Escanear QRCode de Evento"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        app:rippleColor="#0D6EFD" />
+
+    <!-- Botão Meus Eventos -->
+    <Button
+        android:id="@+id/btnMeusEventos"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="#0D6EFD"
+
+        android:text="Meus Eventos"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        app:rippleColor="#0D6EFD" />
+
+    <!-- Botão Eventos que Entrei -->
+    <Button
+        android:id="@+id/btnEventosQueEntrei"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="32dp"
+        android:backgroundTint="#0D6EFD"
+
+        android:text="Eventos que Entrei"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        app:rippleColor="#0D6EFD" />
+
+    <!-- Rodapé -->
+
+</LinearLayout>
