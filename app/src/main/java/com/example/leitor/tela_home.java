@@ -12,7 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class tela_home extends AppCompatActivity {
-    private Button btnCriarEvento,btnUsuario;
+    private Button btnCriarEvento,btnUsuario,btnEscanearEvento;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
@@ -28,6 +28,11 @@ public class tela_home extends AppCompatActivity {
         btnUsuario = findViewById(R.id.btnUsuario);
         btnUsuario.setOnClickListener(v -> {
             Intent intent = new Intent(tela_home.this, usuario.class);
+            startActivity(intent);
+        });
+        btnEscanearEvento = findViewById(R.id.btnEscanearEvento);
+        btnEscanearEvento.setOnClickListener(v -> {
+            Intent intent = new Intent(tela_home.this, ScanQRActivity.class);
             startActivity(intent);
         });
 
