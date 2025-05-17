@@ -52,7 +52,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Email"
-                    android:inputType="textEmailAddress"/>
+                    android:inputType="textEmailAddress"
+                    android:textColor="#050505"
+                    android:textColorHint="#2F2B2B" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Senha -->
@@ -74,7 +76,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Senha"
-                    android:inputType="textPassword"/>
+                    android:inputType="textPassword"
+                    android:textColor="#050505"
+                    android:textColorHint="#2F2B2B" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Botão Logar -->

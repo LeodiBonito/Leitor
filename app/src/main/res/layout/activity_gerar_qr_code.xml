@@ -99,17 +99,35 @@
             android:layout_height="259dp"
             android:layout_gravity="center"
             android:contentDescription="QR Code" />
-        <Button
-            android:id="@+id/btnVoltar"
-            android:layout_width="147dp"
-            android:layout_height="38dp"
-            android:backgroundTint="#009688"
-            android:gravity="center"
-            android:paddingStart="16dp"
 
-            android:paddingEnd="16dp"
-            android:text="Voltar"
-            android:textColor="#050505" />
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <Button
+                android:id="@+id/btnSalvar"
+                android:layout_width="158dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#009688"
+                android:gravity="center"
+                android:paddingStart="16dp"
+
+                android:paddingEnd="16dp"
+                android:text="Salvar"
+                android:textColor="#050505" />
+
+            <Button
+                android:id="@+id/btnVoltar"
+                android:layout_width="158dp"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#009688"
+                android:gravity="center"
+                android:paddingStart="16dp"
+
+                android:paddingEnd="16dp"
+                android:text="Voltar"
+                android:textColor="#050505" />
+        </TableRow>
 
 
     </LinearLayout>
