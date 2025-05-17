@@ -43,4 +43,5 @@ dependencies {
     implementation(libs.cardview)
     implementation(libs.zxing)
     implementation("com.google.android.gms:play-services-vision:20.1.3")
+    implementation ("com.google.code.gson:gson:2.10.1")
 }

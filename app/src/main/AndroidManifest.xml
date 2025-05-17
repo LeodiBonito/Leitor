@@ -22,10 +22,7 @@
         android:theme="@style/Theme.Leitor"
         tools:targetApi="31">
         <activity
-            android:name=".eventosInscritos"
-            android:exported="false" />
-        <activity
-            android:name=".meusEventos"
+            android:name=".TelaManutencaoEvento"
             android:exported="false" />
         <activity
             android:name=".ScanQRActivity"

@@ -13,7 +13,6 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +21,9 @@ import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -44,7 +46,6 @@ public class ScanQRActivity extends AppCompatActivity {
 
         btnBack.setOnClickListener(v -> finish());
 
-        // Verificar permissão de câmera
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
         } else {
@@ -70,7 +71,7 @@ public class ScanQRActivity extends AppCompatActivity {
                         cameraSource.start(holder);
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e("Camera Error", "Erro ao iniciar câmera", e);
                 }
             }
 
@@ -90,17 +91,40 @@ public class ScanQRActivity extends AppCompatActivity {
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> qrCodes = detections.getDetectedItems();
-                if (qrCodes.size() != 0) {
-                    tvResult.post(() -> {
-                        String result = qrCodes.valueAt(0).displayValue;
-                        tvResult.setText(result);
+                if (qrCodes.size() > 0) {
+                    final Barcode barcode = qrCodes.valueAt(0);
+                    final String rawValue = barcode.displayValue;
 
-                        // Aqui você pode adicionar a lógica para processar o QR Code do evento
-                        // Por exemplo, verificar no banco de dados e abrir os detalhes do evento
-                        Toast.makeText(ScanQRActivity.this, "Evento encontrado: " + result, Toast.LENGTH_SHORT).show();
+                    runOnUiThread(() -> {
+                        try {
+                            // Processa como JSON
+                            JSONObject json = new JSONObject(rawValue);
+                            String nomeEvento = json.getString("evento");
+                            String inicio = json.getString("inicio");
+                            String termino = json.getString("termino");
+                            String endereco = json.getString("endereco");
+                            String descricao = json.getString("descricao");
 
-                        // Fechar a tela de escaneamento após ler o QR Code
-                        finish();
+                            tvResult.setText("Evento: " + nomeEvento);
+
+                            // Exemplo: abrir nova tela com os dados
+                            Intent intent = new Intent(ScanQRActivity.this, gerarQrCode .class);
+                            intent.putExtra("nomeEvento", nomeEvento);
+                            intent.putExtra("inicio", inicio);
+                            intent.putExtra("termino", termino);
+                            intent.putExtra("endereco", endereco);
+                            intent.putExtra("descricao", descricao);
+                            startActivity(intent);
+
+                        } catch (JSONException e) {
+                            // Se não for JSON, trata como texto simples
+                            tvResult.setText(rawValue);
+
+                            // Mensagem de inscrição no evento
+                            Toast.makeText(ScanQRActivity.this,
+                                    "✅ Inscrição confirmada no evento!\n" + rawValue,
+                                    Toast.LENGTH_LONG).show();
+                        }
                     });
                 }
             }
@@ -114,7 +138,7 @@ public class ScanQRActivity extends AppCompatActivity {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 initializeQRScanner();
             } else {
-                Toast.makeText(this, "Permissão da câmera necessária para escanear QR Codes", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Permissão da câmera é necessária", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
