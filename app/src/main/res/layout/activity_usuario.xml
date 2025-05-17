@@ -13,6 +13,7 @@
         android:padding="16dp">
 
         <!-- Cabeçalho do Perfil -->
+
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -151,17 +152,30 @@
         </androidx.cardview.widget.CardView>
 
         <!-- Botão Sair -->
+
+        <Button
+            android:id="@+id/btnVoltar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#009688"
+            android:gravity="center"
+            android:paddingStart="16dp"
+
+            android:paddingEnd="16dp"
+            android:text="Voltar"
+            android:textColor="#050505" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnSair"
             android:layout_width="match_parent"
             android:layout_height="50dp"
+            android:layout_marginTop="8dp"
             android:text="Sair"
-            app:cornerRadius="8dp"
             android:textColor="#FFFFFF"
-            app:backgroundTint="#DC3545"
             android:textSize="16sp"
             android:textStyle="bold"
-            app:rippleColor="#BD2130"
-            android:layout_marginTop="8dp"/>
+            app:backgroundTint="#DC3545"
+            app:cornerRadius="8dp"
+            app:rippleColor="#BD2130" />
     </LinearLayout>
 </ScrollView>
