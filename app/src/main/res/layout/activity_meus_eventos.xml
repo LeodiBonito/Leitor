@@ -1,0 +1,64 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#F5F5F5">
+
+    <!-- Cabeçalho -->
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="20dp" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginBottom="16dp">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:text="Meus Eventos"
+            android:textColor="#009688"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Lista de eventos -->
+    <ListView
+        android:id="@+id/listViewMeusEventos"
+        android:layout_width="wrap_content"
+        android:layout_height="594dp"
+        android:divider="#000000"
+        android:dividerHeight="2dp"
+        android:padding="8dp" />
+
+    <!-- Mensagem quando lista está vazia -->
+    <TextView
+        android:id="@+id/txtSemEventos"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Você ainda não criou nenhum evento"
+        android:textColor="#666"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="32dp"/>
+    <Button
+        android:id="@+id/btnVoltar"
+        android:layout_width="147dp"
+        android:layout_height="38dp"
+        android:backgroundTint="#009688"
+        android:gravity="center"
+        android:paddingStart="16dp"
+
+        android:paddingEnd="16dp"
+        android:text="Voltar"
+        android:textColor="#050505" />
+
+
+</LinearLayout>
