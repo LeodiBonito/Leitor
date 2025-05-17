@@ -22,6 +22,12 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+
 public class gerarQrCode extends AppCompatActivity {
 
     EditText editTextNomeEvento, editTextDataHoraInicio, editTextDataHoraTermino, editTextEndereco, editTextDescricao;
@@ -130,6 +136,12 @@ public class gerarQrCode extends AppCompatActivity {
             }
         });
 
+        btnVoltar.setOnClickListener(v -> {
+            Intent intent = new Intent(gerarQrCode.this, tela_home.class);
+            startActivity(intent);
+            finish(); // Opcional - remove a activity da pilha
+        });
+
         btnSalvar.setOnClickListener(v -> {
             if (qrCodeBitmap == null) {
                 Toast.makeText(this, "Gere o QR Code antes de salvar", Toast.LENGTH_SHORT).show();
@@ -147,19 +159,30 @@ public class gerarQrCode extends AppCompatActivity {
     }
 
     private void salvarEvento(String nomeEvento) {
-        // Aqui você pode implementar a lógica para salvar no banco de dados
-        // Por enquanto, vamos apenas passar para a tela meusEventos
+        // Referência do banco de dados
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference eventosRef = database.getReference("eventos");
 
-        Intent intent = new Intent(this, meusEventos.class);
-        intent.putExtra("novoEvento", nomeEvento);
+        // Cria um novo ID único
+        String eventoId = eventosRef.push().getKey();
 
-        // Você pode adicionar mais dados do evento aqui
-        intent.putExtra("dataInicio", editTextDataHoraInicio.getText().toString());
-        intent.putExtra("dataTermino", editTextDataHoraTermino.getText().toString());
-        intent.putExtra("endereco", editTextEndereco.getText().toString());
-        intent.putExtra("descricao", editTextDescricao.getText().toString());
+        // Cria objeto Evento
+        Evento novoEvento = new Evento(
+                nomeEvento,
+                editTextDataHoraInicio.getText().toString(),
+                editTextDataHoraTermino.getText().toString(),
+                editTextEndereco.getText().toString(),
+                editTextDescricao.getText().toString()
+        );
+        novoEvento.setId(eventoId);
 
-        startActivity(intent);
-        Toast.makeText(this, "Evento salvo com sucesso!", Toast.LENGTH_SHORT).show();
+        // Salva no Firebase
+        eventosRef.child(eventoId).setValue(novoEvento)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Evento salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Erro ao salvar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 }

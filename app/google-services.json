@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "677990762773",
+    "project_id": "eventosqrcode-84e94",
+    "storage_bucket": "eventosqrcode-84e94.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:677990762773:android:3e5b71f13b801394df011c",
+        "android_client_info": {
+          "package_name": "com.example.leitor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3WBrk_R4U87QXr9Cr3AL4ARFXHRjuYas"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

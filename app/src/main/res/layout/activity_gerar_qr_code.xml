@@ -120,10 +120,11 @@
                 android:id="@+id/btnVoltar"
                 android:layout_width="158dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="end"
+
                 android:backgroundTint="#009688"
                 android:gravity="center"
                 android:paddingStart="16dp"
-
                 android:paddingEnd="16dp"
                 android:text="Voltar"
                 android:textColor="#050505" />
