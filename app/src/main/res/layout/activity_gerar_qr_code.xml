@@ -27,56 +27,61 @@
             android:id="@+id/editTextNomeEvento"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:hint="Nome do evento"
-            android:padding="12dp"
             android:layout_marginBottom="12dp"
+            android:hint="Nome do evento"
             android:inputType="text"
-            android:textColor="#000000"/>
+            android:padding="12dp"
+            android:textColor="#000000"
+            android:textColorHint="#2F2B2B" />
 
         <EditText
             android:id="@+id/editTextDataHoraInicio"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:hint="Data e hora de início (dd/mm/aaaa+hh:mm)"
-            android:padding="12dp"
             android:layout_marginBottom="12dp"
-            android:inputType="datetime"
             android:digits="0123456789/+:"
+            android:hint="Data e hora de início (dd/mm/aaaa+hh:mm)"
+            android:inputType="datetime"
             android:maxLength="16"
-            android:textColor="#000000"/>
+            android:padding="12dp"
+            android:textColor="#000000"
+            android:textColorHint="#2F2B2B" />
 
         <EditText
             android:id="@+id/editTextDataHoraTermino"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:hint="Data e hora de término (dd/mm/aaaa+hh:mm)"
-            android:padding="12dp"
             android:layout_marginBottom="12dp"
-            android:inputType="datetime"
             android:digits="0123456789/+:"
+            android:hint="Data e hora de término (dd/mm/aaaa+hh:mm)"
+            android:inputType="datetime"
             android:maxLength="16"
-            android:textColor="#000000"/>
+            android:padding="12dp"
+            android:textColor="#000000"
+            android:textColorHint="#2F2B2B" />
 
         <EditText
             android:id="@+id/editTextEndereco"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:hint="Endereço"
-            android:padding="12dp"
             android:layout_marginBottom="12dp"
+            android:hint="Endereço"
             android:inputType="textPostalAddress"
-            android:textColor="#000000"/>
+            android:padding="12dp"
+            android:textColor="#000000"
+            android:textColorHint="#2F2B2B" />
 
         <EditText
             android:id="@+id/editTextDescricao"
             android:layout_width="match_parent"
             android:layout_height="96dp"
-            android:hint="Descrição"
-            android:padding="12dp"
             android:layout_marginBottom="16dp"
-            android:inputType="textMultiLine"
             android:gravity="top"
-            android:textColor="#000000"/>
+            android:hint="Descrição"
+            android:inputType="textMultiLine"
+            android:padding="12dp"
+            android:textColor="#000000"
+            android:textColorHint="#2F2B2B" />
 
         <Button
             android:id="@+id/buttonGenerate"
