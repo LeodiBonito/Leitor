@@ -91,9 +91,21 @@
         <ImageView
             android:id="@+id/imageViewQRCode"
             android:layout_width="250dp"
-            android:layout_height="250dp"
+            android:layout_height="259dp"
             android:layout_gravity="center"
             android:contentDescription="QR Code" />
+        <Button
+            android:id="@+id/btnVoltar"
+            android:layout_width="147dp"
+            android:layout_height="38dp"
+            android:backgroundTint="#009688"
+            android:gravity="center"
+            android:paddingStart="16dp"
+
+            android:paddingEnd="16dp"
+            android:text="Voltar"
+            android:textColor="#050505" />
+
 
     </LinearLayout>
 </ScrollView>

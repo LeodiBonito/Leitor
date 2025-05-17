@@ -10,10 +10,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -22,7 +26,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
 
-public class ScanQRActivity extends AppCompatActivity {
+public class scanQRActivity extends AppCompatActivity {
 
     private static final int CAMERA_PERMISSION_REQUEST = 100;
     private SurfaceView surfaceView;
@@ -42,8 +46,8 @@ public class ScanQRActivity extends AppCompatActivity {
         btnBack.setOnClickListener(v -> finish());
 
         // Verificar permissão de câmera
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
         } else {
             initializeQRScanner();
         }
@@ -63,7 +67,7 @@ public class ScanQRActivity extends AppCompatActivity {
             @Override
             public void surfaceCreated(SurfaceHolder holder) {
                 try {
-                    if (ActivityCompat.checkSelfPermission(ScanQRActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    if (ActivityCompat.checkSelfPermission(scanQRActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                         cameraSource.start(holder);
                     }
                 } catch (IOException e) {
@@ -94,7 +98,7 @@ public class ScanQRActivity extends AppCompatActivity {
 
                         // Aqui você pode adicionar a lógica para processar o QR Code do evento
                         // Por exemplo, verificar no banco de dados e abrir os detalhes do evento
-                        Toast.makeText(ScanQRActivity.this, "Evento encontrado: " + result, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(scanQRActivity.this, "Evento encontrado: " + result, Toast.LENGTH_SHORT).show();
 
                         // Fechar a tela de escaneamento após ler o QR Code
                         finish();

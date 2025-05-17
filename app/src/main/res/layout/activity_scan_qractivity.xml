@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:background="@android:color/white"
-    tools:context=".ScanQRActivity">
+    tools:context=".scanQRActivity">
 
     <TextView
         android:id="@+id/tvTitle"

@@ -22,7 +22,7 @@ import java.util.regex.Pattern;
 public class gerarQrCode extends AppCompatActivity {
 
     EditText editTextNomeEvento, editTextDataHoraInicio, editTextDataHoraTermino, editTextEndereco, editTextDescricao;
-    Button buttonGenerate;
+    Button buttonGenerate,btnVoltar;
     ImageView imageViewQRCode;
 
     private TextWatcher createDateTimeFormatter(final EditText editText) {
@@ -71,6 +71,9 @@ public class gerarQrCode extends AppCompatActivity {
         editTextDescricao = findViewById(R.id.editTextDescricao);
         buttonGenerate = findViewById(R.id.buttonGenerate);
         imageViewQRCode = findViewById(R.id.imageViewQRCode);
+        Button btnVoltar = findViewById(R.id.btnVoltar);
+
+        btnVoltar.setOnClickListener(v -> finish());
 
         InputFilter dateTimeFilter = new InputFilter() {
             Pattern mPattern = Pattern.compile("\\d{0,2}/?\\d{0,2}/?\\d{0,4}\\-?\\d{0,2}:?\\d{0,2}");
