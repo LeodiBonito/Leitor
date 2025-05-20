@@ -12,6 +12,17 @@ public class Evento {
     // Construtor vazio obrigatório para o Firebase
     public Evento() {}
 
+    public Evento(String id, String nome, String dataInicio, String dataTermino, String endereco, String descricao, String qrCodeBase64) {
+        this.id = id;
+        this.nome = nome;
+        this.dataInicio = dataInicio;
+        this.dataTermino = dataTermino;
+        this.endereco = endereco;
+        this.descricao = descricao;
+        this.qrCodeBase64 = qrCodeBase64;
+    }
+
+
     // Getters e Setters
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }

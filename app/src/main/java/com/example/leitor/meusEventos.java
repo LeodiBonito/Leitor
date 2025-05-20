@@ -86,7 +86,10 @@ public class meusEventos extends AppCompatActivity {
     }
 
     private void carregarEventos() {
-        databaseRef.addValueEventListener(new ValueEventListener() {
+        String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference eventosUsuarioRef = FirebaseDatabase.getInstance().getReference("eventos").child(uid);
+
+        eventosUsuarioRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 eventosList.clear();
@@ -115,4 +118,5 @@ public class meusEventos extends AppCompatActivity {
             }
         });
     }
+
 }

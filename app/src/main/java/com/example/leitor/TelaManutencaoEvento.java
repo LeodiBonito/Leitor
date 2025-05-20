@@ -1,30 +1,31 @@
 package com.example.leitor;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.util.Base64;
-import android.widget.ImageView;
+import java.util.UUID;
 
 public class TelaManutencaoEvento extends AppCompatActivity {
-    private EditText edtNomeEvento, edtDataInicio, edtDataTermino, edtEndereco, edtDescricao;
-    private ImageView imageViewQrCode;
-    private Button btnExcluir, btnAtualizar, btnVoltar;
+
+    private EditText edtNome, edtDescricao, edtEndereco;
+    private EditText edtDataInicio, edtDataTermino;
+    private Button btnAtualizar;
     private DatabaseReference databaseRef;
-    private String eventoId;
+    private FirebaseUser user;
+    private Evento eventoEdicao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,101 +33,102 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         setContentView(R.layout.activity_tela_manutencao_evento);
 
         // Inicializa Firebase
+        user = FirebaseAuth.getInstance().getCurrentUser();
         databaseRef = FirebaseDatabase.getInstance().getReference("eventos");
 
-        // Vincula os componentes
-        edtNomeEvento = findViewById(R.id.edtNomeEvento);
+        // Inicializa componentes
+        edtNome = findViewById(R.id.edtNomeEvento);
+        edtDescricao = findViewById(R.id.edtDescricao);
+        edtEndereco = findViewById(R.id.edtEndereco);
         edtDataInicio = findViewById(R.id.edtDataInicio);
         edtDataTermino = findViewById(R.id.edtDataTermino);
-        edtEndereco = findViewById(R.id.edtEndereco);
-        edtDescricao = findViewById(R.id.edtDescricao);
-        imageViewQrCode = findViewById(R.id.imageViewQrCode);
-        btnExcluir = findViewById(R.id.btnExcluir);
         btnAtualizar = findViewById(R.id.btnAtualizar);
-        btnVoltar = findViewById(R.id.btnVoltar);
 
+        // Verifica se é edição
+        String eventoId = getIntent().getStringExtra("EVENTO_ID");
+        if (eventoId != null) {
+            carregarEventoParaEdicao(eventoId);
+        }
 
-        // Recupera os dados do Intent
-        Intent intent = getIntent();
-        if (intent != null) {
-            eventoId = intent.getStringExtra("eventoId");
-            edtNomeEvento.setText(intent.getStringExtra("eventoNome"));
-            edtDataInicio.setText(intent.getStringExtra("dataInicio"));
-            edtDataTermino.setText(intent.getStringExtra("dataTermino"));
-            edtEndereco.setText(intent.getStringExtra("endereco"));
-            edtDescricao.setText(intent.getStringExtra("descricao"));
+        btnAtualizar.setOnClickListener(v -> salvarEvento());
+    }
 
-            String qrCodeBase64 = intent.getStringExtra("qrCodeBase64");
-            if (qrCodeBase64 != null && !qrCodeBase64.isEmpty()) {
-                try {
-                    byte[] decodedBytes = Base64.decode(qrCodeBase64, Base64.DEFAULT);
-                    Bitmap decodedBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-
-                    if (decodedBitmap != null) {
-                        imageViewQrCode.setImageBitmap(decodedBitmap);
-                        Log.d("QR_DEBUG", "QR Code exibido com sucesso");
-                    } else {
-                        Log.e("QR_DEBUG", "Falha ao decodificar Bitmap");
-                    }
-                } catch (Exception e) {
-                    Log.e("QR_DEBUG", "Erro ao decodificar QR Code: " + e.getMessage());
+    private void carregarEventoParaEdicao(String eventoId) {
+        databaseRef.child(eventoId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                eventoEdicao = snapshot.getValue(Evento.class);
+                if (eventoEdicao != null) {
+                    preencherCampos(eventoEdicao);
                 }
-            } else {
-                Log.e("QR_DEBUG", "QR Code Base64 está vazio ou nulo");
             }
-        }
 
-        btnExcluir.setOnClickListener(v -> excluirEvento());
-        btnAtualizar.setOnClickListener(v -> alterarEvento());
-        btnVoltar.setOnClickListener(v -> finish());
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(TelaManutencaoEvento.this, "Erro ao carregar evento", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private void excluirEvento() {
-        if (eventoId != null && !eventoId.isEmpty()) {
-            databaseRef.child(eventoId).removeValue()
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Evento excluído com sucesso", Toast.LENGTH_SHORT).show();
-                        finish();
-                    })
-                    .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Erro ao excluir evento: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-        } else {
-            Toast.makeText(this, "Erro: ID do evento não encontrado", Toast.LENGTH_SHORT).show();
-        }
+    private void preencherCampos(Evento evento) {
+        edtNome.setText(evento.getNome());
+        edtDescricao.setText(evento.getDescricao());
+        edtEndereco.setText(evento.getEndereco());
+        edtDataInicio.setText(evento.getDataInicio());
+        edtDataTermino.setText(evento.getDataTermino());
     }
 
-    private void alterarEvento() {
-        String nome = edtNomeEvento.getText().toString().trim();
+    private void salvarEvento() {
+        String nome = edtNome.getText().toString().trim();
+        String descricao = edtDescricao.getText().toString().trim();
+        String endereco = edtEndereco.getText().toString().trim();
         String dataInicio = edtDataInicio.getText().toString().trim();
         String dataTermino = edtDataTermino.getText().toString().trim();
-        String endereco = edtEndereco.getText().toString().trim();
-        String descricao = edtDescricao.getText().toString().trim();
 
-        if (nome.isEmpty() || dataInicio.isEmpty() || dataTermino.isEmpty()) {
-            Toast.makeText(this, "Preencha os campos obrigatórios", Toast.LENGTH_SHORT).show();
-            return;
-        }
+        if (validarCampos(nome, dataInicio, dataTermino)) {
+            // Gerar QR Code (simplificado - na prática gere um código real)
+            String qrCodeBase64 = "IVBORw0KGgoAAAANSUHEUgAAAAJYCAYAAAC+ZpjcAAAAAXNSR0IArs4c60AAAAARzOkIUCAglCHwiZIgAAASLSURBVHic7dhBr";
 
-        if (eventoId != null && !eventoId.isEmpty()) {
-            Evento evento = new Evento();
-            evento.setId(eventoId);
-            evento.setNome(nome);
-            evento.setDataInicio(dataInicio);
-            evento.setDataTermino(dataTermino);
-            evento.setEndereco(endereco);
-            evento.setDescricao(descricao);
+            Evento evento;
+            if (eventoEdicao != null) {
+                // Edição
+                evento = eventoEdicao;
+                evento.setNome(nome);
+                evento.setDescricao(descricao);
+                evento.setEndereco(endereco);
+                evento.setDataInicio(dataInicio);
+                evento.setDataTermino(dataTermino);
+            } else {
+                // Novo evento
+                String id = UUID.randomUUID().toString();
+                evento = new Evento(id,nome,dataInicio,dataTermino,endereco,descricao,qrCodeBase64);
+                evento.setId(id);
+            }
 
-            databaseRef.child(eventoId).setValue(evento)
+            databaseRef.child(evento.getId()).setValue(evento)
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Evento atualizado com sucesso", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Evento salvo com sucesso!", Toast.LENGTH_SHORT).show();
                         finish();
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Erro ao atualizar evento: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Erro ao salvar evento: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
-        } else {
-            Toast.makeText(this, "Erro: ID do evento não encontrado", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private boolean validarCampos(String nome, String dataInicio, String dataTermino) {
+        if (nome.isEmpty()) {
+            edtNome.setError("Nome é obrigatório");
+            return false;
+        }
+        if (dataInicio.isEmpty()) {
+            edtDataInicio.setError("Data de início é obrigatória");
+            return false;
+        }
+        if (dataTermino.isEmpty()) {
+            edtDataTermino.setError("Data de término é obrigatória");
+            return false;
+        }
+        return true;
     }
 }
