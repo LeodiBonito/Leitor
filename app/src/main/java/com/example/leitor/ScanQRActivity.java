@@ -14,16 +14,12 @@ import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -32,7 +28,6 @@ public class ScanQRActivity extends AppCompatActivity {
     private static final int CAMERA_PERMISSION_REQUEST = 100;
     private SurfaceView surfaceView;
     private CameraSource cameraSource;
-    private TextView tvResult;
     private BarcodeDetector barcodeDetector;
 
     @Override
@@ -41,11 +36,11 @@ public class ScanQRActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scan_qractivity);
 
         surfaceView = findViewById(R.id.surfaceView);
-        tvResult = findViewById(R.id.tvResult);
         Button btnBack = findViewById(R.id.btnBack);
 
         btnBack.setOnClickListener(v -> finish());
 
+        // Verificar e solicitar permissão da câmera
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
         } else {
@@ -57,6 +52,12 @@ public class ScanQRActivity extends AppCompatActivity {
         barcodeDetector = new BarcodeDetector.Builder(this)
                 .setBarcodeFormats(Barcode.QR_CODE)
                 .build();
+
+        if (!barcodeDetector.isOperational()) {
+            Toast.makeText(this, "Não foi possível configurar o leitor QR", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
 
         cameraSource = new CameraSource.Builder(this, barcodeDetector)
                 .setRequestedPreviewSize(640, 480)
@@ -72,6 +73,7 @@ public class ScanQRActivity extends AppCompatActivity {
                     }
                 } catch (IOException e) {
                     Log.e("Camera Error", "Erro ao iniciar câmera", e);
+                    Toast.makeText(ScanQRActivity.this, "Erro ao iniciar câmera", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -92,39 +94,18 @@ public class ScanQRActivity extends AppCompatActivity {
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> qrCodes = detections.getDetectedItems();
                 if (qrCodes.size() > 0) {
-                    final Barcode barcode = qrCodes.valueAt(0);
-                    final String rawValue = barcode.displayValue;
+                    final String eventId = qrCodes.valueAt(0).displayValue;
 
                     runOnUiThread(() -> {
-                        try {
-                            // Processa como JSON
-                            JSONObject json = new JSONObject(rawValue);
-                            String nomeEvento = json.getString("evento");
-                            String inicio = json.getString("inicio");
-                            String termino = json.getString("termino");
-                            String endereco = json.getString("endereco");
-                            String descricao = json.getString("descricao");
+                        // Navegar para a tela de eventos inscritos com o ID do evento
+                        Intent intent = new Intent(ScanQRActivity.this, eventosInscritos.class);
+                        intent.putExtra("eventoId", eventId);
+                        startActivity(intent);
+                        finish();
 
-                            tvResult.setText("Evento: " + nomeEvento);
-
-                            // Exemplo: abrir nova tela com os dados
-                            Intent intent = new Intent(ScanQRActivity.this, gerarQrCode .class);
-                            intent.putExtra("nomeEvento", nomeEvento);
-                            intent.putExtra("inicio", inicio);
-                            intent.putExtra("termino", termino);
-                            intent.putExtra("endereco", endereco);
-                            intent.putExtra("descricao", descricao);
-                            startActivity(intent);
-
-                        } catch (JSONException e) {
-                            // Se não for JSON, trata como texto simples
-                            tvResult.setText(rawValue);
-
-                            // Mensagem de inscrição no evento
-                            Toast.makeText(ScanQRActivity.this,
-                                    "✅ Inscrição confirmada no evento!\n" + rawValue,
-                                    Toast.LENGTH_LONG).show();
-                        }
+                        Toast.makeText(ScanQRActivity.this,
+                                "Evento registrado com sucesso!",
+                                Toast.LENGTH_SHORT).show();
                     });
                 }
             }

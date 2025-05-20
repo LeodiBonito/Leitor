@@ -5,6 +5,11 @@
       <config />
     </shared>
     <layouts>
+      <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_detalhes_evento.xml">
+        <config>
+          <theme>@style/Theme.Leitor</theme>
+        </config>
+      </layout>
       <layout url="file://$PROJECT_DIR$/app/src/main/res/layout/activity_eventos_inscritos.xml">
         <config>
           <theme>@style/Theme.Leitor</theme>
@@ -56,9 +61,10 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f1544a8-5a33-47b2-8f0b-354f3e2f3c4c" name="Changes" comment="telas eventosInscritos e meusEventos;&#10;Botões de voltar;&#10;:D">
-      <change afterPath="$PROJECT_DIR$/app/google-services.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/Evento.java" afterDir="false" />
+    <list default="true" id="6f1544a8-5a33-47b2-8f0b-354f3e2f3c4c" name="Changes" comment=" banco de dados firebase">
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/DetalhesEventoActivity.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/EventoAdapter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_detalhes_evento.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" afterDir="false" />
@@ -66,13 +72,25 @@
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/outputFiles.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Evento.java" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/google-services.json" beforeDir="false" afterPath="$PROJECT_DIR$/app/google-services.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/Evento.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/Evento.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/MainActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/ScanQRActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/ScanQRActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/TelaManutencaoEvento.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/TelaManutencaoEvento.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/eventosInscritos.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/eventosInscritos.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/gerarQrCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/gerarQrCode.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/meusEventos.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/meusEventos.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_gerar_qr_code.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_gerar_qr_code.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gradle/libs.versions.toml" beforeDir="false" afterPath="$PROJECT_DIR$/gradle/libs.versions.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/tela_home.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/tela_home.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_eventos_inscritos.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_eventos_inscritos.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_meus_eventos.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_meus_eventos.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_tela_manutencao_evento.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_tela_manutencao_evento.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle.kts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -108,7 +126,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/LeodiBonito/Leitor.git&quot;,
-    &quot;accountId&quot;: &quot;4876e5c3-b700-49ac-9ff6-97b2d520b314&quot;
+    &quot;accountId&quot;: &quot;54146596-79b0-4537-8330-21927dfb4c32&quot;
   }
 }</component>
   <component name="ProblemsViewState">
@@ -135,9 +153,10 @@
     &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
     &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;com.google.services.firebase.aqiPopupShown&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/Murilo/AndroidStudioProjects/Leitor&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Leo/AndroidStudioProjects/bancodedados&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;AndroidSdkUpdater&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -158,6 +177,9 @@
       <recent name="com.example.leitor" />
     </key>
     <key name="android.template.-126855202">
+      <recent name="com.example.leitor" />
+    </key>
+    <key name="android.template.1182807171">
       <recent name="com.example.leitor" />
     </key>
   </component>
@@ -260,7 +282,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747501617210</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary=" banco de dados firebase">
+      <option name="closed" value="true" />
+      <created>1747516224202</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1747516224202</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -277,19 +307,20 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="telas eventosInscritos e meusEventos;&#10;Botões de voltar;&#10;:D" />
     <MESSAGE value="telas eventosInscritos e meusEventos;&#10;Botões de voltar;&#10;:D abc" />
-    <option name="LAST_COMMIT_MESSAGE" value="telas eventosInscritos e meusEventos;&#10;Botões de voltar;&#10;:D abc" />
+    <MESSAGE value=" banco de dados firebase" />
+    <option name="LAST_COMMIT_MESSAGE" value=" banco de dados firebase" />
   </component>
   <component name="play_dynamic_filters_status">
     <option name="appIdToCheckInfo">
       <map>
         <entry key="com.example.leitor">
           <value>
-            <CheckInfo lastCheckTimestamp="1747498598846" />
+            <CheckInfo lastCheckTimestamp="1747689828261" />
           </value>
         </entry>
         <entry key="com.example.leitor.test">
           <value>
-            <CheckInfo lastCheckTimestamp="1747498598826" />
+            <CheckInfo lastCheckTimestamp="1747689828281" />
           </value>
         </entry>
       </map>

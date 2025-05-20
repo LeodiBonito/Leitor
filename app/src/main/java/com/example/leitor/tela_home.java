@@ -2,14 +2,21 @@ package com.example.leitor;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class tela_home extends AppCompatActivity {
     private Button btnCriarEvento,btnUsuario,btnEscanearEvento,btnMeusEventos,btnEventosQueEntrei;
@@ -47,6 +54,20 @@ public class tela_home extends AppCompatActivity {
             Intent intent = new Intent(tela_home.this, meusEventos.class);
             startActivity(intent);
         });
+
+        // Na sua MainActivity ou Application:
+        FirebaseDatabase.getInstance().getReference(".info/connected")
+                .addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        Boolean connected = snapshot.getValue(Boolean.class);
+                        Log.d("FIREBASE", "Conectado: " + connected);
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("FIREBASE", "Erro: " + error.getMessage());
+                    }
+                });
 
     }
 }

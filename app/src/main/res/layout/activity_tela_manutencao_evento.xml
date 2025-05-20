@@ -1,44 +1,136 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
-
-    <EditText
-        android:id="@+id/edtEvento"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nome do Evento"/>
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="16dp">
+        android:orientation="vertical"
+        android:padding="16dp">
 
-        <Button
-            android:id="@+id/btnExcluir"
-            android:layout_width="0dp"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Excluir"
-            android:layout_marginEnd="8dp"/>
+            android:text="Manutenção de Evento"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
 
-        <Button
-            android:id="@+id/btnAlterar"
-            android:layout_width="0dp"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Alterar"
-            android:layout_marginStart="8dp"/>
+            android:text="Nome do evento"
+            android:layout_marginTop="16dp"/>
+
+        <EditText
+            android:id="@+id/edtNomeEvento"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Digite o nome do evento"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Data e hora de início (dd/mm/aaaa hh:mm)"
+            android:layout_marginTop="16dp"/>
+
+        <EditText
+            android:id="@+id/edtDataInicio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="datetime"
+            android:hint="dd/mm/aaaa hh:mm"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Data e hora de término (dd/mm/aaaa hh:mm)"
+            android:layout_marginTop="16dp"/>
+
+        <EditText
+            android:id="@+id/edtDataTermino"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="datetime"
+            android:hint="dd/mm/aaaa hh:mm"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Endereço"
+            android:layout_marginTop="16dp"/>
+
+        <EditText
+            android:id="@+id/edtEndereco"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Digite o endereço do evento"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Descrição"
+            android:layout_marginTop="16dp"/>
+
+        <EditText
+            android:id="@+id/edtDescricao"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Digite a descrição do evento"
+            android:minLines="3"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="QR Code do Evento"
+            android:layout_marginTop="16dp"/>
+
+        <ImageView
+            android:id="@+id/imageViewQrCode"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:contentDescription="QR Code do Evento"
+            android:scaleType="fitCenter"/>
+
+        <!-- Container dos botões Atualizar/Excluir -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnAtualizar"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:text="ATUALIZAR"
+                android:textColor="@android:color/white"/>
+
+            <Button
+                android:id="@+id/btnExcluir"
+                android:layout_width="0dp"
+                android:layout_height="48dp"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="EXCLUIR"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+
+        <!-- Botão Voltar -->
+        <Button
+            android:id="@+id/btnVoltar"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp"
+            android:text="VOLTAR"
+            android:textColor="@android:color/white"/>
     </LinearLayout>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Voltar"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"
-        android:onClick="voltar"/>
-</LinearLayout>
+</ScrollView>

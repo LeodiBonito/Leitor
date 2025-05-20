@@ -1,3 +1,4 @@
+// TELA GERAR QR CODE
 package com.example.leitor;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -24,9 +26,8 @@ import java.util.regex.Pattern;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import android.util.Base64;
+import java.io.ByteArrayOutputStream;
 
 public class gerarQrCode extends AppCompatActivity {
 
@@ -84,8 +85,6 @@ public class gerarQrCode extends AppCompatActivity {
         imageViewQRCode = findViewById(R.id.imageViewQRCode);
         btnVoltar = findViewById(R.id.btnVoltar);
 
-        btnVoltar.setOnClickListener(v -> finish());
-
         InputFilter dateTimeFilter = new InputFilter() {
             Pattern mPattern = Pattern.compile("\\d{0,2}/?\\d{0,2}/?\\d{0,4}\\-?\\d{0,2}:?\\d{0,2}");
 
@@ -111,25 +110,28 @@ public class gerarQrCode extends AppCompatActivity {
             String endereco = editTextEndereco.getText().toString().trim();
             String descricao = editTextDescricao.getText().toString().trim();
 
-            if (nomeEvento.isEmpty() || dataHoraInicio.isEmpty() || dataHoraTermino.isEmpty() || endereco.isEmpty() || descricao.isEmpty()) {
+            if (nomeEvento.isEmpty() || dataHoraInicio.isEmpty() || dataHoraTermino.isEmpty() ||
+                    endereco.isEmpty() || descricao.isEmpty()) {
                 Toast.makeText(gerarQrCode.this, "Preencha todos os campos!", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            String conteudoQRCodeJson = String.format(
-                    "{\"evento\":\"%s\",\"inicio\":\"%s\",\"termino\":\"%s\",\"endereco\":\"%s\",\"descricao\":\"%s\"}",
-                    nomeEvento, dataHoraInicio, dataHoraTermino, endereco, descricao
-            );
+            // Gerar um ID único para o evento
+            String eventoId = UUID.randomUUID().toString();
 
             try {
                 BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
                 qrCodeBitmap = barcodeEncoder.encodeBitmap(
-                        conteudoQRCodeJson,
+                        eventoId,  // Apenas o ID do evento como conteúdo do QR Code
                         BarcodeFormat.QR_CODE,
                         600, 600
                 );
                 imageViewQRCode.setImageBitmap(qrCodeBitmap);
                 Toast.makeText(gerarQrCode.this, "QR Code gerado com sucesso!", Toast.LENGTH_SHORT).show();
+
+                // Armazena o ID que foi usado no QR Code para usar ao salvar
+                editTextNomeEvento.setTag(eventoId);
+
             } catch (WriterException e) {
                 e.printStackTrace();
                 Toast.makeText(gerarQrCode.this, "Erro ao gerar QR Code", Toast.LENGTH_SHORT).show();
@@ -139,7 +141,7 @@ public class gerarQrCode extends AppCompatActivity {
         btnVoltar.setOnClickListener(v -> {
             Intent intent = new Intent(gerarQrCode.this, tela_home.class);
             startActivity(intent);
-            finish(); // Opcional - remove a activity da pilha
+            finish();
         });
 
         btnSalvar.setOnClickListener(v -> {
@@ -159,27 +161,69 @@ public class gerarQrCode extends AppCompatActivity {
     }
 
     private void salvarEvento(String nomeEvento) {
+        // Recupera o ID que foi gerado para o QR Code
+        String eventoId = (String) editTextNomeEvento.getTag();
+
+        if (eventoId == null || eventoId.isEmpty()) {
+            Toast.makeText(this, "Gere o QR Code antes de salvar", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         // Referência do banco de dados
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference eventosRef = database.getReference("eventos");
 
-        // Cria um novo ID único
-        String eventoId = eventosRef.push().getKey();
+        // Converte o QR Code Bitmap para Base64
+        String qrCodeBase64 = "";
+        if (qrCodeBitmap != null) {
+            try {
+                Log.d("QR_DEBUG", "Iniciando conversão do QR Code para Base64");
+                Log.d("QR_DEBUG", "Dimensões do Bitmap: " + qrCodeBitmap.getWidth() + "x" + qrCodeBitmap.getHeight());
+
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                boolean compressSuccess = qrCodeBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+
+                Log.d("QR_DEBUG", "Compressão do Bitmap: " + (compressSuccess ? "SUCESSO" : "FALHA"));
+
+                byte[] byteArray = byteArrayOutputStream.toByteArray();
+                qrCodeBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+                Log.d("QR_DEBUG", "Conversão para Base64 completa");
+                Log.d("QR_DEBUG", "Tamanho do Base64: " + qrCodeBase64.length() + " caracteres");
+                Log.d("QR_DEBUG", "Primeiros 20 chars: " + qrCodeBase64.substring(0, Math.min(qrCodeBase64.length(), 20)));
+
+            } catch (Exception e) {
+                Log.e("QR_DEBUG", "Erro na conversão do QR Code: " + e.getMessage());
+                e.printStackTrace();
+            }
+        } else {
+            Log.e("QR_DEBUG", "qrCodeBitmap é NULO - Não foi possível gerar QR Code");
+        }
 
         // Cria objeto Evento
-        Evento novoEvento = new Evento(
-                nomeEvento,
-                editTextDataHoraInicio.getText().toString(),
-                editTextDataHoraTermino.getText().toString(),
-                editTextEndereco.getText().toString(),
-                editTextDescricao.getText().toString()
-        );
+        Evento novoEvento = new Evento();
         novoEvento.setId(eventoId);
+        novoEvento.setNome(nomeEvento);
+        novoEvento.setDataInicio(editTextDataHoraInicio.getText().toString());
+        novoEvento.setDataTermino(editTextDataHoraTermino.getText().toString());
+        novoEvento.setEndereco(editTextEndereco.getText().toString());
+        novoEvento.setDescricao(editTextDescricao.getText().toString());
+        novoEvento.setQrCodeBase64(qrCodeBase64);
 
         // Salva no Firebase
         eventosRef.child(eventoId).setValue(novoEvento)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Evento salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Evento e QR Code salvos com sucesso!", Toast.LENGTH_SHORT).show();
+
+                    // Limpa os campos após salvar
+                    editTextNomeEvento.setText("");
+                    editTextDataHoraInicio.setText("");
+                    editTextDataHoraTermino.setText("");
+                    editTextEndereco.setText("");
+                    editTextDescricao.setText("");
+                    imageViewQRCode.setImageBitmap(null);
+                    qrCodeBitmap = null;
+                    editTextNomeEvento.setTag(null); // Limpa o ID armazenado
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Erro ao salvar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
