@@ -34,6 +34,7 @@ public class meusEventos extends AppCompatActivity {
     private ListView listView;
     private TextView txtSemEventos;
     private Button btnVoltar;
+    private String uidAtual = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +69,7 @@ public class meusEventos extends AppCompatActivity {
             Log.d("EventoDebug", "QR Code exists: " + (evento.getQrCodeBase64() != null));
             Intent intent = new Intent(this, TelaManutencaoEvento.class);
             intent.putExtra("eventoId", evento.getId());
+            intent.putExtra("uid", uidAtual); // ✅ Passa o UID do usuário
             intent.putExtra("eventoNome", evento.getNome());
             intent.putExtra("dataInicio", evento.getDataInicio());
             intent.putExtra("dataTermino", evento.getDataTermino());
@@ -87,13 +89,12 @@ public class meusEventos extends AppCompatActivity {
             return;
         }
 
-        String uid = currentUser.getUid();
-        Log.d("Firebase", "UID do usuário: " + uid);
+        uidAtual = currentUser.getUid();
+        Log.d("Firebase", "UID do usuário: " + uidAtual);
 
-        // Pega os eventos criados pelo usuário
         DatabaseReference eventosUsuarioRef = FirebaseDatabase.getInstance()
                 .getReference("eventos")
-                .child(uid);
+                .child(uidAtual);
 
         eventosUsuarioRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -131,5 +132,4 @@ public class meusEventos extends AppCompatActivity {
             }
         });
     }
-
 }

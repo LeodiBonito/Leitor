@@ -24,7 +24,7 @@ public class TelaManutencaoEvento extends AppCompatActivity {
     private EditText edtDataInicio, edtDataTermino;
     private Button btnAtualizar;
     private DatabaseReference databaseRef;
-    private FirebaseUser user;
+    private String uid;
     private Evento eventoEdicao;
 
     @Override
@@ -32,11 +32,15 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tela_manutencao_evento);
 
-        // Inicializa Firebase
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        databaseRef = FirebaseDatabase.getInstance().getReference("eventos");
+        // Recupera UID passado por outra tela
+        uid = getIntent().getStringExtra("uid");
+        if (uid == null) {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) uid = user.getUid();
+        }
 
-        // Inicializa componentes
+        databaseRef = FirebaseDatabase.getInstance().getReference("eventos").child(uid);
+
         edtNome = findViewById(R.id.edtNomeEvento);
         edtDescricao = findViewById(R.id.edtDescricao);
         edtEndereco = findViewById(R.id.edtEndereco);
@@ -44,8 +48,7 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         edtDataTermino = findViewById(R.id.edtDataTermino);
         btnAtualizar = findViewById(R.id.btnAtualizar);
 
-        // Verifica se é edição
-        String eventoId = getIntent().getStringExtra("EVENTO_ID");
+        String eventoId = getIntent().getStringExtra("eventoId");
         if (eventoId != null) {
             carregarEventoParaEdicao(eventoId);
         }
@@ -59,6 +62,7 @@ public class TelaManutencaoEvento extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 eventoEdicao = snapshot.getValue(Evento.class);
                 if (eventoEdicao != null) {
+                    eventoEdicao.setId(snapshot.getKey());
                     preencherCampos(eventoEdicao);
                 }
             }
@@ -86,25 +90,27 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         String dataTermino = edtDataTermino.getText().toString().trim();
 
         if (validarCampos(nome, dataInicio, dataTermino)) {
-            // Gerar QR Code (simplificado - na prática gere um código real)
             String qrCodeBase64 = "IVBORw0KGgoAAAANSUHEUgAAAAJYCAYAAAC+ZpjcAAAAAXNSR0IArs4c60AAAAARzOkIUCAglCHwiZIgAAASLSURBVHic7dhBr";
 
             Evento evento;
             if (eventoEdicao != null) {
-                // Edição
                 evento = eventoEdicao;
                 evento.setNome(nome);
                 evento.setDescricao(descricao);
                 evento.setEndereco(endereco);
                 evento.setDataInicio(dataInicio);
                 evento.setDataTermino(dataTermino);
+                // Mantém o QR code já existente
+                if (evento.getQrCodeBase64() == null) {
+                    evento.setQrCodeBase64(qrCodeBase64);
+                }
             } else {
-                // Novo evento
                 String id = UUID.randomUUID().toString();
-                evento = new Evento(id,nome,dataInicio,dataTermino,endereco,descricao,qrCodeBase64);
+                evento = new Evento(id, nome, dataInicio, dataTermino, endereco, descricao, qrCodeBase64);
                 evento.setId(id);
             }
 
+            // Salva no caminho correto: eventos/{uid}/{eventoId}
             databaseRef.child(evento.getId()).setValue(evento)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(this, "Evento salvo com sucesso!", Toast.LENGTH_SHORT).show();
