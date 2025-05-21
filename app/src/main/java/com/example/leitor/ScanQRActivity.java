@@ -130,32 +130,38 @@ public class ScanQRActivity extends AppCompatActivity {
             return;
         }
 
-        String uidUsuario = user.getUid();
+        String uid = user.getUid();
 
-        // 🔥 Busca evento na pasta do próprio usuário
+        // 🔥 Busca evento no nó eventosPublicos
         DatabaseReference eventoRef = FirebaseDatabase.getInstance()
-                .getReference("eventos")
-                .child(uidUsuario)
+                .getReference("eventosPublicos")
                 .child(eventoId);
 
         eventoRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    String eventoId = snapshot.child("eventoId").getValue(String.class);
-                    String nome = snapshot.child("nomeEvento").getValue(String.class);
-                    String dataInicio = snapshot.child("dataHoraInicio").getValue(String.class);
-                    String dataTermino = snapshot.child("dataHoraTermino").getValue(String.class);
+                    String nome = snapshot.child("nome").getValue(String.class);
+                    String dataInicio = snapshot.child("dataInicio").getValue(String.class);
+                    String dataTermino = snapshot.child("dataTermino").getValue(String.class);
                     String endereco = snapshot.child("endereco").getValue(String.class);
                     String descricao = snapshot.child("descricao").getValue(String.class);
+                    String qrCodeBase64 = snapshot.child("qrCodeBase64").getValue(String.class);
 
                     Evento evento = new Evento();
+                    evento.setId(eventoId);
+                    evento.setNome(nome);
+                    evento.setDataInicio(dataInicio);
+                    evento.setDataTermino(dataTermino);
+                    evento.setEndereco(endereco);
+                    evento.setDescricao(descricao);
+                    evento.setQrCodeBase64(qrCodeBase64);
 
-                    // ✔️ Salva na pasta users/uidUsuario/inscriçãoEvento/eventoId
+                    // ✔️ Salvar na inscrição do usuário
                     DatabaseReference inscritoRef = FirebaseDatabase.getInstance()
-                            .getReference("users")
-                            .child(uidUsuario)
-                            .child("inscriçãoEvento")
+                            .getReference("usuarios")
+                            .child(uid)
+                            .child("inscricaoEvento")
                             .child(eventoId);
 
                     inscritoRef.setValue(evento).addOnCompleteListener(task -> {
@@ -191,27 +197,4 @@ public class ScanQRActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == CAMERA_PERMISSION_REQUEST) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                initializeQRScanner();
-            } else {
-                Toast.makeText(this, "Permissão da câmera é necessária", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (cameraSource != null) {
-            cameraSource.release();
-        }
-        if (barcodeDetector != null) {
-            barcodeDetector.release();
-        }
-    }
 }

@@ -31,38 +31,39 @@ public class eventosInscritos extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eventos_inscritos);
 
-
         btnVoltar = findViewById(R.id.btnVoltar);
         mAuth = FirebaseAuth.getInstance();
         listViewEventosInscritos = findViewById(R.id.listViewEventosInscritos);
 
-        // Inicializa o adapter com o layout padrão do Android
         adapter = new EventoAdapter(this, eventosList);
         listViewEventosInscritos.setAdapter(adapter);
 
         btnVoltar.setOnClickListener(v -> finish());
-        carregarEventosInscritos();
+
+        carregarEventosPublicos();
     }
 
-    private void carregarEventosInscritos() {
-        String uid = mAuth.getCurrentUser().getUid();
+    private void carregarEventosPublicos() {
+        DatabaseReference eventosRef = FirebaseDatabase.getInstance().getReference("eventosPublicos");
 
-        DatabaseReference userInscricoesRef = FirebaseDatabase.getInstance()
-                .getReference("usuarios")
-                .child(uid)
-                .child("eventos_inscritos");
-
-        userInscricoesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        eventosRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                List<String> chavesEventos = new ArrayList<>();
+                eventosList.clear();
 
-                // Coleta todas as chaves de eventos inscritos
-                for (DataSnapshot inscricaoSnapshot : snapshot.getChildren()) {
-                    chavesEventos.add(inscricaoSnapshot.getKey());
+                if (snapshot.exists()) {
+                    for (DataSnapshot eventoSnapshot : snapshot.getChildren()) {
+                        Evento evento = eventoSnapshot.getValue(Evento.class);
+                        if (evento != null) {
+                            eventosList.add(evento);
+                        }
+                    }
+                    adapter.notifyDataSetChanged();
+                } else {
+                    Toast.makeText(eventosInscritos.this,
+                            "Nenhum evento encontrado.",
+                            Toast.LENGTH_SHORT).show();
                 }
-
-                carregarDetalhesDosEventos(chavesEventos);
             }
 
             @Override
@@ -84,14 +85,16 @@ public class eventosInscritos extends AppCompatActivity {
 
                 for (String chaveComposta : chavesEventos) {
                     String[] partes = chaveComposta.split("_");
+
                     if (partes.length == 2) {
                         String uidDono = partes[0];
                         String eventoId = partes[1];
 
-                        // Busca o evento específico
                         DataSnapshot eventoSnapshot = snapshot.child(uidDono).child(eventoId);
+
                         if (eventoSnapshot.exists()) {
                             Evento evento = eventoSnapshot.getValue(Evento.class);
+
                             if (evento != null) {
                                 eventosList.add(evento);
                             }
@@ -99,7 +102,6 @@ public class eventosInscritos extends AppCompatActivity {
                     }
                 }
 
-                // Notifica o adapter que os dados mudaram
                 adapter.notifyDataSetChanged();
             }
 
