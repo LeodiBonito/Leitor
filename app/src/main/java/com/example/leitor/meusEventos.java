@@ -26,9 +26,10 @@ public class meusEventos extends AppCompatActivity {
     private Button btnVoltar;
     private ListView listViewMeusEventos;
     private ArrayList<String> listaEventos;
+    private ArrayList<String> listaIdsEventos;
     private ArrayAdapter<String> adapter;
 
-    private DatabaseReference eventosRef;
+    private DatabaseReference eventosRef, usuariosRef;
     private FirebaseAuth auth;
 
     @Override
@@ -42,47 +43,54 @@ public class meusEventos extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         String uid = auth.getCurrentUser().getUid();
+
         eventosRef = FirebaseDatabase.getInstance().getReference("eventos").child(uid);
+        usuariosRef = FirebaseDatabase.getInstance().getReference("usuarios").child(uid);
 
         listaEventos = new ArrayList<>();
+        listaIdsEventos = new ArrayList<>();
 
-        // Configura o adapter
         adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, listaEventos);
         listViewMeusEventos.setAdapter(adapter);
 
-        // Carrega os eventos do Firebase
         carregarEventosDoFirebase();
 
-        // Configura o clique nos itens da lista
-        listViewMeusEventos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String eventoSelecionado = listaEventos.get(position);
+        listViewMeusEventos.setOnItemClickListener((parent, view, position, id) -> {
+            String eventoId = listaIdsEventos.get(position);
 
-                Intent intent = new Intent(meusEventos.this, TelaManutencaoEvento.class);
-                intent.putExtra("evento", eventoSelecionado);
-                intent.putExtra("posicao", position);
-
-                startActivity(intent);
-            }
+            Intent intent = new Intent(meusEventos.this, TelaManutencaoEvento.class);
+            intent.putExtra("eventoId", eventoId);
+            intent.putExtra("uid", uid);
+            startActivity(intent);
         });
 
         btnVoltar.setOnClickListener(v -> finish());
     }
 
-    // Método para buscar eventos do Firebase
     private void carregarEventosDoFirebase() {
         eventosRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 listaEventos.clear();
+                listaIdsEventos.clear();
+
+                int contadorEventos = 0;
+
                 for (DataSnapshot eventoSnapshot : snapshot.getChildren()) {
+                    String id = eventoSnapshot.getKey();
                     String nomeEvento = eventoSnapshot.child("nome").getValue(String.class);
-                    if (nomeEvento != null) {
+
+                    if (id != null && nomeEvento != null) {
                         listaEventos.add(nomeEvento);
+                        listaIdsEventos.add(id);
+                        contadorEventos++;
                     }
                 }
+
+                // Atualiza o contador de eventos no nó do usuário
+                usuariosRef.child("eventosCriados").setValue(contadorEventos);
+
                 adapter.notifyDataSetChanged();
             }
 
@@ -93,7 +101,7 @@ public class meusEventos extends AppCompatActivity {
         });
     }
 
-    // Método opcional para adicionar evento manualmente
+    // Método opcional para adicionar evento manualmente na lista (não necessário com Firebase)
     public void adicionarEvento(String novoEvento) {
         listaEventos.add(novoEvento);
         adapter.notifyDataSetChanged();

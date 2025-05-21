@@ -46,10 +46,6 @@ public class telaPerfil extends AppCompatActivity {
         btnVoltar.setOnClickListener(v -> voltar());
         btnSair.setOnClickListener(v -> sair());
 
-        // Simulação dos eventos
-        txtEventosCriados.setText("0");
-        txtEventosParticipados.setText("0");
-
         // Carregar dados do usuário
         carregarDadosUsuario();
     }
@@ -65,8 +61,15 @@ public class telaPerfil extends AppCompatActivity {
                     String nome = snapshot.child("nome").getValue(String.class);
                     String email = snapshot.child("email").getValue(String.class);
 
+                    Long eventosCriados = snapshot.child("eventosCriados").getValue(Long.class);
+                    Long eventosParticipados = snapshot.child("eventosParticipados").getValue(Long.class);
+
                     txtNome.setText(nome != null ? nome : "Nome não encontrado");
                     txtEmail.setText(email != null ? email : "Email não encontrado");
+
+                    txtEventosCriados.setText(eventosCriados != null ? String.valueOf(eventosCriados) : "0");
+                    txtEventosParticipados.setText(eventosParticipados != null ? String.valueOf(eventosParticipados) : "0");
+
                 } else {
                     Toast.makeText(telaPerfil.this, "Usuário não encontrado no banco de dados", Toast.LENGTH_SHORT).show();
                 }
