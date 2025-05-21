@@ -48,7 +48,7 @@ public class eventosInscritos extends AppCompatActivity {
         String uidUsuario = mAuth.getCurrentUser().getUid();
 
         DatabaseReference userInscricoesRef = FirebaseDatabase.getInstance()
-                .getReference("users")
+                .getReference("usuarios")
                 .child(uidUsuario)
                 .child("eventos_inscritos");
 
