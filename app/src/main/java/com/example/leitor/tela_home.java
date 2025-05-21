@@ -34,8 +34,8 @@ public class tela_home extends AppCompatActivity {
         });
         btnUsuario = findViewById(R.id.btnUsuario);
         btnUsuario.setOnClickListener(v -> {
-            Intent intent = new Intent(tela_home.this, usuario.class);
-            finish();
+            Intent intent = new Intent(tela_home.this, telaPerfil.class);
+
             startActivity(intent);
         });
         btnEscanearEvento = findViewById(R.id.btnEscanearEvento);

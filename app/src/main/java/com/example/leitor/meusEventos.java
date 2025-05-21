@@ -2,134 +2,67 @@ package com.example.leitor;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
+import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class meusEventos extends AppCompatActivity {
-    private DatabaseReference databaseRef;
-    private ArrayAdapter<String> adapter;
-    private ArrayList<String> eventosList = new ArrayList<>();
-    private List<Evento> eventosObjList = new ArrayList<>();
-    private ListView listView;
-    private TextView txtSemEventos;
     private Button btnVoltar;
-    private String uidAtual = "";
+    private ListView listViewMeusEventos;
+    private ArrayList<String> listaEventos;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_meus_eventos);
 
-        try {
-            FirebaseApp.initializeApp(this);
-            listView = findViewById(R.id.listViewMeusEventos);
-            txtSemEventos = findViewById(R.id.txtSemEventos);
-            btnVoltar = findViewById(R.id.btnVoltar);
+        btnVoltar = findViewById(R.id.btnVoltar);
+        listViewMeusEventos = findViewById(R.id.listViewMeusEventos);
 
-            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, eventosList);
-            listView.setAdapter(adapter);
+        // Inicializa a lista de eventos (substitua por seus dados reais)
+        listaEventos = new ArrayList<>();
 
-            btnVoltar.setOnClickListener(v -> finish());
+        // Configura o adapter
+        adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_list_item_1, listaEventos);
+        listViewMeusEventos.setAdapter(adapter);
 
-            listView.setOnItemClickListener((parent, view, position, id) -> abrirTelaManutencao(position));
-
-            carregarEventos();
-
-        } catch (Exception e) {
-            Toast.makeText(this, "Erro ao inicializar: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            e.printStackTrace();
-            finish();
-        }
-    }
-
-    private void abrirTelaManutencao(int position) {
-        if (position >= 0 && position < eventosObjList.size()) {
-            Evento evento = eventosObjList.get(position);
-            Log.d("EventoDebug", "QR Code exists: " + (evento.getQrCodeBase64() != null));
-            Intent intent = new Intent(this, TelaManutencaoEvento.class);
-            intent.putExtra("eventoId", evento.getId());
-            intent.putExtra("uid", uidAtual); // ✅ Passa o UID do usuário
-            intent.putExtra("eventoNome", evento.getNome());
-            intent.putExtra("dataInicio", evento.getDataInicio());
-            intent.putExtra("dataTermino", evento.getDataTermino());
-            intent.putExtra("endereco", evento.getEndereco());
-            intent.putExtra("descricao", evento.getDescricao());
-            intent.putExtra("qrCodeBase64", evento.getQrCodeBase64());
-            startActivity(intent);
-        }
-    }
-
-    private void carregarEventos() {
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (currentUser == null) {
-            Toast.makeText(this, "Usuário não autenticado", Toast.LENGTH_LONG).show();
-            Log.e("Firebase", "Usuário não autenticado");
-            return;
-        }
-
-        uidAtual = currentUser.getUid();
-        Log.d("Firebase", "UID do usuário: " + uidAtual);
-
-        DatabaseReference eventosUsuarioRef = FirebaseDatabase.getInstance()
-                .getReference("eventos")
-                .child(uidAtual);
-
-        eventosUsuarioRef.addValueEventListener(new ValueEventListener() {
+        // Configura o clique nos itens da lista
+        listViewMeusEventos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                eventosList.clear();
-                eventosObjList.clear();
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                // Recupera o evento selecionado
+                String eventoSelecionado = listaEventos.get(position);
 
-                Log.d("Firebase", "Snapshot recebido: " + snapshot.toString());
+                // Cria a intenção para abrir a tela de manutenção
+                Intent intent = new Intent(meusEventos.this, TelaManutencaoEvento.class);
 
-                if (snapshot.exists()) {
-                    for (DataSnapshot data : snapshot.getChildren()) {
-                        Evento evento = data.getValue(Evento.class);
-                        if (evento != null) {
-                            evento.setId(data.getKey());
-                            Log.d("Firebase", "Evento lido: " + evento.getNome());
-                            eventosList.add(evento.getNome());
-                            eventosObjList.add(evento);
-                        } else {
-                            Log.w("Firebase", "Evento nulo em: " + data.getKey());
-                        }
-                    }
-                    txtSemEventos.setVisibility(View.GONE);
-                } else {
-                    txtSemEventos.setVisibility(View.VISIBLE);
-                    Log.d("Firebase", "Nenhum evento encontrado.");
-                }
+                // Passa os dados do evento para a tela de manutenção
+                intent.putExtra("evento", eventoSelecionado);
+                intent.putExtra("posicao", position);
 
-                adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(meusEventos.this, "Erro ao carregar eventos: " + error.getMessage(), Toast.LENGTH_LONG).show();
-                Log.e("Firebase", "Erro no listener: " + error.getMessage());
+                startActivity(intent);
             }
         });
+
+        btnVoltar.setOnClickListener(v -> finish());
+    }
+
+    // Método para adicionar um novo evento à lista
+    public void adicionarEvento(String novoEvento) {
+        listaEventos.add(novoEvento);
+        adapter.notifyDataSetChanged();
     }
 }

@@ -25,6 +25,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".telaPerfil"
+            android:exported="false" />
+        <activity
             android:name=".DetalhesEventoActivity"
             android:exported="false" />
         <activity
