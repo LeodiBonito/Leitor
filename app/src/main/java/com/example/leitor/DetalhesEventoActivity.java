@@ -1,5 +1,7 @@
 package com.example.leitor;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,12 +11,10 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 public class DetalhesEventoActivity extends AppCompatActivity {
 
-    private TextView tvNomeEvento, tvDataInicio, tvDataTermino, tvEndereco, tvDescricao;
-    private ImageView imageViewQRCode;
+    private TextView tvNome, tvDataInicio, tvDataTermino, tvEndereco, tvDescricao;
+    private ImageView imageQrCode;
     private Button btnVoltar;
 
     @Override
@@ -22,29 +22,35 @@ public class DetalhesEventoActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalhes_evento);
 
-        // Inicializar views
-        tvNomeEvento = findViewById(R.id.tvNomeEvento);
+        tvNome = findViewById(R.id.tvNome);
         tvDataInicio = findViewById(R.id.tvDataInicio);
         tvDataTermino = findViewById(R.id.tvDataTermino);
         tvEndereco = findViewById(R.id.tvEndereco);
         tvDescricao = findViewById(R.id.tvDescricao);
-        imageViewQRCode = findViewById(R.id.imageViewQRCode);
+        imageQrCode = findViewById(R.id.imageQRCode);
         btnVoltar = findViewById(R.id.btnVoltar);
 
-        // Obter dados do intent
+        // 🔄 Recuperar dados passados pela Intent
         Intent intent = getIntent();
-        tvNomeEvento.setText(intent.getStringExtra("nomeEvento"));
-        tvDataInicio.setText(intent.getStringExtra("dataInicio"));
-        tvDataTermino.setText(intent.getStringExtra("dataTermino"));
-        tvEndereco.setText(intent.getStringExtra("endereco"));
-        tvDescricao.setText(intent.getStringExtra("descricao"));
-
-        // Carregar QR Code
+        String nome = intent.getStringExtra("nome");
+        String dataInicio = intent.getStringExtra("dataInicio");
+        String dataTermino = intent.getStringExtra("dataTermino");
+        String endereco = intent.getStringExtra("endereco");
+        String descricao = intent.getStringExtra("descricao");
         String qrCodeBase64 = intent.getStringExtra("qrCodeBase64");
+
+        // 📝 Mostrar os dados nos TextViews
+        tvNome.setText("Nome: " + nome);
+        tvDataInicio.setText("Início: " + dataInicio);
+        tvDataTermino.setText("Término: " + dataTermino);
+        tvEndereco.setText("Endereço: " + endereco);
+        tvDescricao.setText("Descrição: " + descricao);
+
+        // 📷 Decodificar o QR Code e mostrar na ImageView
         if (qrCodeBase64 != null && !qrCodeBase64.isEmpty()) {
-            byte[] decodedString = Base64.decode(qrCodeBase64, Base64.DEFAULT);
-            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-            imageViewQRCode.setImageBitmap(decodedByte);
+            byte[] decodedBytes = Base64.decode(qrCodeBase64, Base64.DEFAULT);
+            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+            imageQrCode.setImageBitmap(bitmap);
         }
 
         btnVoltar.setOnClickListener(v -> finish());

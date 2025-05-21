@@ -3,7 +3,9 @@ package com.example.leitor;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -40,11 +42,31 @@ public class eventosInscritos extends AppCompatActivity {
 
         btnVoltar.setOnClickListener(v -> finish());
 
-        carregarEventosPublicos();
+        carregarEventosInscritos();
+
+        // 👉 Clique no item da lista para abrir tela de detalhes
+        listViewEventosInscritos.setOnItemClickListener((parent, view, position, id) -> {
+            Evento eventoSelecionado = eventosList.get(position);
+
+            Intent intent = new Intent(eventosInscritos.this, DetalhesEventoActivity.class);
+            intent.putExtra("nome", eventoSelecionado.getNome());
+            intent.putExtra("dataInicio", eventoSelecionado.getDataInicio());
+            intent.putExtra("dataTermino", eventoSelecionado.getDataTermino());
+            intent.putExtra("endereco", eventoSelecionado.getEndereco());
+            intent.putExtra("descricao", eventoSelecionado.getDescricao());
+            intent.putExtra("qrCodeBase64", eventoSelecionado.getQrCodeBase64());
+
+            startActivity(intent);
+        });
     }
 
-    private void carregarEventosPublicos() {
-        DatabaseReference eventosRef = FirebaseDatabase.getInstance().getReference("eventosPublicos");
+    private void carregarEventosInscritos() {
+        String uid = mAuth.getCurrentUser().getUid();
+
+        DatabaseReference eventosRef = FirebaseDatabase.getInstance()
+                .getReference("usuarios")
+                .child(uid)
+                .child("inscricaoEvento");
 
         eventosRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -61,7 +83,7 @@ public class eventosInscritos extends AppCompatActivity {
                     adapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(eventosInscritos.this,
-                            "Nenhum evento encontrado.",
+                            "Nenhum evento inscrito.",
                             Toast.LENGTH_SHORT).show();
                 }
             }
@@ -70,45 +92,6 @@ public class eventosInscritos extends AppCompatActivity {
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(eventosInscritos.this,
                         "Erro: " + error.getMessage(),
-                        Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void carregarDetalhesDosEventos(List<String> chavesEventos) {
-        DatabaseReference eventosRef = FirebaseDatabase.getInstance().getReference("eventos");
-
-        eventosRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                eventosList.clear();
-
-                for (String chaveComposta : chavesEventos) {
-                    String[] partes = chaveComposta.split("_");
-
-                    if (partes.length == 2) {
-                        String uidDono = partes[0];
-                        String eventoId = partes[1];
-
-                        DataSnapshot eventoSnapshot = snapshot.child(uidDono).child(eventoId);
-
-                        if (eventoSnapshot.exists()) {
-                            Evento evento = eventoSnapshot.getValue(Evento.class);
-
-                            if (evento != null) {
-                                eventosList.add(evento);
-                            }
-                        }
-                    }
-                }
-
-                adapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(eventosInscritos.this,
-                        "Erro ao carregar eventos: " + error.getMessage(),
                         Toast.LENGTH_SHORT).show();
             }
         });
