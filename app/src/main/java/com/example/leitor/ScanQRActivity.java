@@ -38,7 +38,7 @@ public class ScanQRActivity extends AppCompatActivity {
     private BarcodeDetector barcodeDetector;
     private FirebaseAuth mAuth;
 
-    private boolean isProcessing = false; // Evita múltiplas leituras do mesmo QR
+    private boolean isProcessing = false; // ✔️ Evita múltiplas leituras do mesmo QR
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +46,7 @@ public class ScanQRActivity extends AppCompatActivity {
         setContentView(R.layout.activity_scan_qractivity);
 
         mAuth = FirebaseAuth.getInstance();
+
         surfaceView = findViewById(R.id.surfaceView);
         Button btnBack = findViewById(R.id.btnBack);
 
@@ -107,14 +108,10 @@ public class ScanQRActivity extends AppCompatActivity {
                 if (qrCodes.size() > 0 && !isProcessing) {
                     isProcessing = true;
 
-                    final String eventoCompleto = qrCodes.valueAt(0).displayValue;
-                    final String[] partes = eventoCompleto.split("_");
+                    final String eventoId = qrCodes.valueAt(0).displayValue.trim(); // ✔️ Agora QR só tem eventoId
 
-                    if (partes.length == 2) {
-                        final String uidDono = partes[0];
-                        final String eventoId = partes[1];
-
-                        salvarEventoInscrito(uidDono, eventoId);
+                    if (!eventoId.isEmpty()) {
+                        salvarEventoInscrito(eventoId);
                     } else {
                         runOnUiThread(() -> {
                             Toast.makeText(ScanQRActivity.this, "QR Code inválido", Toast.LENGTH_SHORT).show();
@@ -126,7 +123,7 @@ public class ScanQRActivity extends AppCompatActivity {
         });
     }
 
-    private void salvarEventoInscrito(String uidDono, String eventoId) {
+    private void salvarEventoInscrito(String eventoId) {
         FirebaseUser user = mAuth.getCurrentUser();
         if (user == null) {
             Toast.makeText(this, "Usuário não autenticado", Toast.LENGTH_SHORT).show();
@@ -135,41 +132,47 @@ public class ScanQRActivity extends AppCompatActivity {
 
         String uidUsuario = user.getUid();
 
+        // 🔥 Busca evento na pasta do próprio usuário
         DatabaseReference eventoRef = FirebaseDatabase.getInstance()
                 .getReference("eventos")
-                .child(uidDono)
+                .child(uidUsuario)
                 .child(eventoId);
 
         eventoRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    Evento evento = snapshot.getValue(Evento.class);
+                    String id = snapshot.child("eventoId").getValue(String.class);
+                    String nome = snapshot.child("nomeEvento").getValue(String.class);
+                    String dataInicio = snapshot.child("dataHoraInicio").getValue(String.class);
+                    String dataTermino = snapshot.child("dataHoraTermino").getValue(String.class);
+                    String endereco = snapshot.child("endereco").getValue(String.class);
+                    String descricao = snapshot.child("descricao").getValue(String.class);
 
-                    if (evento != null) {
-                        // Salvar na pasta eventos_inscritos do usuário
-                        DatabaseReference inscritoRef = FirebaseDatabase.getInstance()
-                                .getReference("users")
-                                .child(uidUsuario)
-                                .child("eventos_inscritos")
-                                .child(eventoId);
+                    Evento evento = new Evento();
 
-                        inscritoRef.setValue(evento).addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                runOnUiThread(() -> {
-                                    Toast.makeText(ScanQRActivity.this, "Evento inscrito com sucesso!", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(ScanQRActivity.this, eventosInscritos.class);
-                                    startActivity(intent);
-                                    finish();
-                                });
-                            } else {
-                                runOnUiThread(() -> {
-                                    Toast.makeText(ScanQRActivity.this, "Erro ao salvar evento inscrito", Toast.LENGTH_SHORT).show();
-                                    isProcessing = false;
-                                });
-                            }
-                        });
-                    }
+                    // ✔️ Salva na pasta users/uidUsuario/inscriçãoEvento/eventoId
+                    DatabaseReference inscritoRef = FirebaseDatabase.getInstance()
+                            .getReference("users")
+                            .child(uidUsuario)
+                            .child("inscriçãoEvento")
+                            .child(eventoId);
+
+                    inscritoRef.setValue(evento).addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            runOnUiThread(() -> {
+                                Toast.makeText(ScanQRActivity.this, "Inscrição realizada com sucesso!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(ScanQRActivity.this, eventosInscritos.class);
+                                startActivity(intent);
+                                finish();
+                            });
+                        } else {
+                            runOnUiThread(() -> {
+                                Toast.makeText(ScanQRActivity.this, "Erro ao salvar inscrição", Toast.LENGTH_SHORT).show();
+                                isProcessing = false;
+                            });
+                        }
+                    });
                 } else {
                     runOnUiThread(() -> {
                         Toast.makeText(ScanQRActivity.this, "Evento não encontrado", Toast.LENGTH_SHORT).show();

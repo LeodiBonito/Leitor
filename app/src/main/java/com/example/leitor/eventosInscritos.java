@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -23,12 +24,15 @@ public class eventosInscritos extends AppCompatActivity {
     private EventoAdapter adapter;
     private List<Evento> eventosList = new ArrayList<>();
     private FirebaseAuth mAuth;
+    private Button btnVoltar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eventos_inscritos);
 
+
+        btnVoltar = findViewById(R.id.btnVoltar);
         mAuth = FirebaseAuth.getInstance();
         listViewEventosInscritos = findViewById(R.id.listViewEventosInscritos);
 
@@ -36,6 +40,7 @@ public class eventosInscritos extends AppCompatActivity {
         adapter = new EventoAdapter(this, eventosList);
         listViewEventosInscritos.setAdapter(adapter);
 
+        btnVoltar.setOnClickListener(v -> finish());
         carregarEventosInscritos();
     }
 
