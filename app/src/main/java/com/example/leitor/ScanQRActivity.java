@@ -21,8 +21,12 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 
@@ -33,6 +37,8 @@ public class ScanQRActivity extends AppCompatActivity {
     private CameraSource cameraSource;
     private BarcodeDetector barcodeDetector;
     private FirebaseAuth mAuth;
+
+    private boolean isProcessing = false; // Evita múltiplas leituras do mesmo QR
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,41 +103,87 @@ public class ScanQRActivity extends AppCompatActivity {
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray<Barcode> qrCodes = detections.getDetectedItems();
-                if (qrCodes.size() > 0) {
+
+                if (qrCodes.size() > 0 && !isProcessing) {
+                    isProcessing = true;
+
                     final String eventoCompleto = qrCodes.valueAt(0).displayValue;
                     final String[] partes = eventoCompleto.split("_");
 
                     if (partes.length == 2) {
                         final String uidDono = partes[0];
                         final String eventoId = partes[1];
-                        final String uidUsuario = mAuth.getCurrentUser().getUid();
 
-                        // Registrar inscrição no Firebase
-                        DatabaseReference userEventosRef = FirebaseDatabase.getInstance()
-                                .getReference("users")
-                                .child(uidUsuario)
-                                .child("eventos_inscritos")
-                                .child(uidDono + "_" + eventoId);
-
-                        userEventosRef.setValue(true).addOnCompleteListener(task -> {
-                            runOnUiThread(() -> {
-                                if (task.isSuccessful()) {
-                                    Intent intent = new Intent(ScanQRActivity.this, eventosInscritos.class);
-                                    intent.putExtra("eventoId", eventoCompleto);
-                                    startActivity(intent);
-                                    finish();
-                                    Toast.makeText(ScanQRActivity.this,
-                                            "Inscrição realizada com sucesso!",
-                                            Toast.LENGTH_SHORT).show();
-                                } else {
-                                    Toast.makeText(ScanQRActivity.this,
-                                            "Erro ao registrar inscrição",
-                                            Toast.LENGTH_SHORT).show();
-                                }
-                            });
+                        salvarEventoInscrito(uidDono, eventoId);
+                    } else {
+                        runOnUiThread(() -> {
+                            Toast.makeText(ScanQRActivity.this, "QR Code inválido", Toast.LENGTH_SHORT).show();
+                            isProcessing = false;
                         });
                     }
                 }
+            }
+        });
+    }
+
+    private void salvarEventoInscrito(String uidDono, String eventoId) {
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user == null) {
+            Toast.makeText(this, "Usuário não autenticado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String uidUsuario = user.getUid();
+
+        DatabaseReference eventoRef = FirebaseDatabase.getInstance()
+                .getReference("eventos")
+                .child(uidDono)
+                .child(eventoId);
+
+        eventoRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    Evento evento = snapshot.getValue(Evento.class);
+
+                    if (evento != null) {
+                        // Salvar na pasta eventos_inscritos do usuário
+                        DatabaseReference inscritoRef = FirebaseDatabase.getInstance()
+                                .getReference("users")
+                                .child(uidUsuario)
+                                .child("eventos_inscritos")
+                                .child(eventoId);
+
+                        inscritoRef.setValue(evento).addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                runOnUiThread(() -> {
+                                    Toast.makeText(ScanQRActivity.this, "Evento inscrito com sucesso!", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(ScanQRActivity.this, eventosInscritos.class);
+                                    startActivity(intent);
+                                    finish();
+                                });
+                            } else {
+                                runOnUiThread(() -> {
+                                    Toast.makeText(ScanQRActivity.this, "Erro ao salvar evento inscrito", Toast.LENGTH_SHORT).show();
+                                    isProcessing = false;
+                                });
+                            }
+                        });
+                    }
+                } else {
+                    runOnUiThread(() -> {
+                        Toast.makeText(ScanQRActivity.this, "Evento não encontrado", Toast.LENGTH_SHORT).show();
+                        isProcessing = false;
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                runOnUiThread(() -> {
+                    Toast.makeText(ScanQRActivity.this, "Erro ao acessar dados do evento", Toast.LENGTH_SHORT).show();
+                    isProcessing = false;
+                });
             }
         });
     }
