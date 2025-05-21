@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -78,19 +79,21 @@ public class meusEventos extends AppCompatActivity {
     }
 
     private void carregarEventos() {
-        String uid = FirebaseAuth.getInstance().getCurrentUser() != null
-                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
-                : null;
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (uid == null) {
+        if (currentUser == null) {
             Toast.makeText(this, "Usuário não autenticado", Toast.LENGTH_LONG).show();
-            Log.e("Firebase", "UID nulo - usuário não autenticado");
+            Log.e("Firebase", "Usuário não autenticado");
             return;
         }
 
+        String uid = currentUser.getUid();
         Log.d("Firebase", "UID do usuário: " + uid);
 
-        DatabaseReference eventosUsuarioRef = FirebaseDatabase.getInstance().getReference("eventos").child(uid);
+        // Pega os eventos criados pelo usuário
+        DatabaseReference eventosUsuarioRef = FirebaseDatabase.getInstance()
+                .getReference("eventos")
+                .child(uid);
 
         eventosUsuarioRef.addValueEventListener(new ValueEventListener() {
             @Override
@@ -100,7 +103,7 @@ public class meusEventos extends AppCompatActivity {
 
                 Log.d("Firebase", "Snapshot recebido: " + snapshot.toString());
 
-                if (snapshot.exists() && snapshot.hasChildren()) {
+                if (snapshot.exists()) {
                     for (DataSnapshot data : snapshot.getChildren()) {
                         Evento evento = data.getValue(Evento.class);
                         if (evento != null) {
@@ -115,7 +118,7 @@ public class meusEventos extends AppCompatActivity {
                     txtSemEventos.setVisibility(View.GONE);
                 } else {
                     txtSemEventos.setVisibility(View.VISIBLE);
-                    Log.d("Firebase", "Nenhum evento encontrado para o usuário.");
+                    Log.d("Firebase", "Nenhum evento encontrado.");
                 }
 
                 adapter.notifyDataSetChanged();
@@ -128,4 +131,5 @@ public class meusEventos extends AppCompatActivity {
             }
         });
     }
+
 }

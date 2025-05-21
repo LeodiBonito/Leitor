@@ -61,23 +61,14 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f1544a8-5a33-47b2-8f0b-354f3e2f3c4c" name="Changes" comment=" banco de dados firebase &#10; leitor atualizado 1">
-      <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/checksums/checksums.lock" afterDir="false" />
+    <list default="true" id="6f1544a8-5a33-47b2-8f0b-354f3e2f3c4c" name="Changes" comment=" banco de dados firebase &#10; leitor atualizado 2">
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/app/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/MainActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/MainActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/ScanQRActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/ScanQRActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/TelaCadastro.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/TelaCadastro.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/eventosInscritos.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/eventosInscritos.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/gerarQrCode.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/gerarQrCode.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/meusEventos.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/meusEventos.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -294,7 +285,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747766052329</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary=" banco de dados firebase &#10; leitor atualizado 2">
+      <option name="closed" value="true" />
+      <created>1747835863028</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1747835863028</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -314,7 +313,8 @@
     <MESSAGE value=" banco de dados firebase" />
     <MESSAGE value=" banco de dados firebase &#10; leitor atualizado" />
     <MESSAGE value=" banco de dados firebase &#10; leitor atualizado 1" />
-    <option name="LAST_COMMIT_MESSAGE" value=" banco de dados firebase &#10; leitor atualizado 1" />
+    <MESSAGE value=" banco de dados firebase &#10; leitor atualizado 2" />
+    <option name="LAST_COMMIT_MESSAGE" value=" banco de dados firebase &#10; leitor atualizado 2" />
   </component>
   <component name="play_dynamic_filters_status">
     <option name="appIdToCheckInfo">
