@@ -15,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -24,13 +25,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.leitor.Evento;
-
 public class meusEventos extends AppCompatActivity {
     private DatabaseReference databaseRef;
     private ArrayAdapter<String> adapter;
     private ArrayList<String> eventosList = new ArrayList<>();
-    private List<Evento> eventosObjList = new ArrayList<>(); // Lista para armazenar objetos Evento completos
+    private List<Evento> eventosObjList = new ArrayList<>();
     private ListView listView;
     private TextView txtSemEventos;
     private Button btnVoltar;
@@ -42,8 +41,6 @@ public class meusEventos extends AppCompatActivity {
 
         try {
             FirebaseApp.initializeApp(this);
-            databaseRef = FirebaseDatabase.getInstance().getReference("eventos");
-
             listView = findViewById(R.id.listViewMeusEventos);
             txtSemEventos = findViewById(R.id.txtSemEventos);
             btnVoltar = findViewById(R.id.btnVoltar);
@@ -53,13 +50,7 @@ public class meusEventos extends AppCompatActivity {
 
             btnVoltar.setOnClickListener(v -> finish());
 
-            // Configurar clique nos itens da lista
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    abrirTelaManutencao(position);
-                }
-            });
+            listView.setOnItemClickListener((parent, view, position, id) -> abrirTelaManutencao(position));
 
             carregarEventos();
 
@@ -69,6 +60,7 @@ public class meusEventos extends AppCompatActivity {
             finish();
         }
     }
+
     private void abrirTelaManutencao(int position) {
         if (position >= 0 && position < eventosObjList.size()) {
             Evento evento = eventosObjList.get(position);
@@ -86,7 +78,18 @@ public class meusEventos extends AppCompatActivity {
     }
 
     private void carregarEventos() {
-        String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+        String uid = FirebaseAuth.getInstance().getCurrentUser() != null
+                ? FirebaseAuth.getInstance().getCurrentUser().getUid()
+                : null;
+
+        if (uid == null) {
+            Toast.makeText(this, "Usuário não autenticado", Toast.LENGTH_LONG).show();
+            Log.e("Firebase", "UID nulo - usuário não autenticado");
+            return;
+        }
+
+        Log.d("Firebase", "UID do usuário: " + uid);
+
         DatabaseReference eventosUsuarioRef = FirebaseDatabase.getInstance().getReference("eventos").child(uid);
 
         eventosUsuarioRef.addValueEventListener(new ValueEventListener() {
@@ -95,18 +98,24 @@ public class meusEventos extends AppCompatActivity {
                 eventosList.clear();
                 eventosObjList.clear();
 
+                Log.d("Firebase", "Snapshot recebido: " + snapshot.toString());
+
                 if (snapshot.exists() && snapshot.hasChildren()) {
                     for (DataSnapshot data : snapshot.getChildren()) {
                         Evento evento = data.getValue(Evento.class);
-                        if (evento != null && evento.getNome() != null) {
-                            evento.setId(data.getKey()); // Armazena o ID do Firebase
+                        if (evento != null) {
+                            evento.setId(data.getKey());
+                            Log.d("Firebase", "Evento lido: " + evento.getNome());
                             eventosList.add(evento.getNome());
                             eventosObjList.add(evento);
+                        } else {
+                            Log.w("Firebase", "Evento nulo em: " + data.getKey());
                         }
                     }
                     txtSemEventos.setVisibility(View.GONE);
                 } else {
                     txtSemEventos.setVisibility(View.VISIBLE);
+                    Log.d("Firebase", "Nenhum evento encontrado para o usuário.");
                 }
 
                 adapter.notifyDataSetChanged();
@@ -115,8 +124,8 @@ public class meusEventos extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(meusEventos.this, "Erro ao carregar eventos: " + error.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e("Firebase", "Erro no listener: " + error.getMessage());
             }
         });
     }
-
 }

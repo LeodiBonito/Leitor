@@ -34,9 +34,6 @@
             android:name=".ScanQRActivity"
             android:exported="false" />
         <activity
-            android:name=".usuario"
-            android:exported="false" />
-        <activity
             android:name=".gerarQrCode"
             android:exported="false" />
         <activity

@@ -17,6 +17,8 @@ import androidx.core.view.WindowInsetsCompat;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
     private EditText edtEmail, edtSenha;
     private Button btnLogin;
@@ -42,9 +44,7 @@ public class MainActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         txtCadastrar = findViewById(R.id.txtCadastrar);
 
-        txtCadastrar.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, TelaCadastro.class));
-        });
+        txtCadastrar.setOnClickListener(v -> verificarEmailAntesDeCadastrar());
 
         btnLogin.setOnClickListener(v -> validarLogin());
     }
@@ -52,12 +52,48 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // Verifica se usuário já está logado
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            startActivity(new Intent(this, tela_home.class));
-            finish();
+        // Comente esta linha se não quiser login automático
+        // FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        // if (user != null) {
+        //    startActivity(new Intent(this, tela_home.class));
+        //    finish();
+        // }
+    }
+
+    private void verificarEmailAntesDeCadastrar() {
+        String email = edtEmail.getText().toString().trim();
+
+        if (email.isEmpty()) {
+            Toast.makeText(this, "Digite um e-mail para cadastrar", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        // Verifica se o e-mail já está cadastrado
+        mAuth.fetchSignInMethodsForEmail(email)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<String> signInMethods = task.getResult().getSignInMethods();
+                        if (signInMethods != null && !signInMethods.isEmpty()) {
+                            // E-mail já cadastrado
+                            new AlertDialog.Builder(this)
+                                    .setTitle("E-mail já cadastrado")
+                                    .setMessage("Este e-mail já está registrado. Deseja fazer login?")
+                                    .setPositiveButton("Sim", (dialog, which) -> {
+                                        // Foca no campo de senha para facilitar o login
+                                        edtSenha.requestFocus();
+                                    })
+                                    .setNegativeButton("Não", null)
+                                    .show();
+                        } else {
+                            // E-mail disponível, prossegue para cadastro
+                            startActivity(new Intent(MainActivity.this, TelaCadastro.class));
+                        }
+                    } else {
+                        Toast.makeText(MainActivity.this,
+                                "Erro ao verificar e-mail: " + task.getException().getMessage(),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void validarLogin() {
@@ -87,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle("Login Falhou")
                 .setMessage("Email ou senha incorretos. Deseja se cadastrar ou verificar os dados?")
                 .setPositiveButton("Cadastrar", (dialog, which) -> {
-                    startActivity(new Intent(MainActivity.this, TelaCadastro.class));
+                    verificarEmailAntesDeCadastrar();
                 })
                 .setNegativeButton("Verificar Dados", null)
                 .setIcon(android.R.drawable.ic_dialog_alert)

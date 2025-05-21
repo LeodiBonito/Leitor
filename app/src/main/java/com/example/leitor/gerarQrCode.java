@@ -169,35 +169,28 @@ public class gerarQrCode extends AppCompatActivity {
             return;
         }
 
-        // Referência do banco de dados
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference eventosRef = database.getReference("eventos");
+        // Obtém o UID do usuário logado
+        String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+        if (uid == null) {
+            Toast.makeText(this, "Usuário não autenticado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Referência do banco de dados no caminho do usuário
+        DatabaseReference eventosRef = FirebaseDatabase.getInstance().getReference("eventos").child(uid);
 
         // Converte o QR Code Bitmap para Base64
         String qrCodeBase64 = "";
         if (qrCodeBitmap != null) {
             try {
-                Log.d("QR_DEBUG", "Iniciando conversão do QR Code para Base64");
-                Log.d("QR_DEBUG", "Dimensões do Bitmap: " + qrCodeBitmap.getWidth() + "x" + qrCodeBitmap.getHeight());
-
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                boolean compressSuccess = qrCodeBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-
-                Log.d("QR_DEBUG", "Compressão do Bitmap: " + (compressSuccess ? "SUCESSO" : "FALHA"));
-
+                qrCodeBitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
                 byte[] byteArray = byteArrayOutputStream.toByteArray();
                 qrCodeBase64 = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-                Log.d("QR_DEBUG", "Conversão para Base64 completa");
-                Log.d("QR_DEBUG", "Tamanho do Base64: " + qrCodeBase64.length() + " caracteres");
-                Log.d("QR_DEBUG", "Primeiros 20 chars: " + qrCodeBase64.substring(0, Math.min(qrCodeBase64.length(), 20)));
-
             } catch (Exception e) {
                 Log.e("QR_DEBUG", "Erro na conversão do QR Code: " + e.getMessage());
                 e.printStackTrace();
             }
-        } else {
-            Log.e("QR_DEBUG", "qrCodeBitmap é NULO - Não foi possível gerar QR Code");
         }
 
         // Cria objeto Evento
@@ -210,7 +203,7 @@ public class gerarQrCode extends AppCompatActivity {
         novoEvento.setDescricao(editTextDescricao.getText().toString());
         novoEvento.setQrCodeBase64(qrCodeBase64);
 
-        // Salva no Firebase
+        // Salva no Firebase (dentro do nó do UID)
         eventosRef.child(eventoId).setValue(novoEvento)
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Evento e QR Code salvos com sucesso!", Toast.LENGTH_SHORT).show();
@@ -223,10 +216,11 @@ public class gerarQrCode extends AppCompatActivity {
                     editTextDescricao.setText("");
                     imageViewQRCode.setImageBitmap(null);
                     qrCodeBitmap = null;
-                    editTextNomeEvento.setTag(null); // Limpa o ID armazenado
+                    editTextNomeEvento.setTag(null);
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Erro ao salvar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
+
 }

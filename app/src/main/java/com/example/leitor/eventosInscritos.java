@@ -1,18 +1,13 @@
 package com.example.leitor;
 
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.Toast;
-import android.view.View;
-import android.widget.AdapterView;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Bundle;
+import android.widget.ListView;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -20,101 +15,95 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class eventosInscritos extends AppCompatActivity {
 
     private ListView listViewEventosInscritos;
-    private Button btnVoltar;
-    private List<Evento> eventosList;
     private EventoAdapter adapter;
-
-    private SharedPreferences sharedPreferences;
-    private static final String PREFS_NAME = "EventosPrefs";
-    private static final String EVENTOS_IDS_KEY = "eventos_ids";
+    private List<Evento> eventosList = new ArrayList<>();
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eventos_inscritos);
 
+        mAuth = FirebaseAuth.getInstance();
         listViewEventosInscritos = findViewById(R.id.listViewEventosInscritos);
-        btnVoltar = findViewById(R.id.btnVoltar);
-        eventosList = new ArrayList<>();
+
+        // Inicializa o adapter com o layout padrão do Android
         adapter = new EventoAdapter(this, eventosList);
         listViewEventosInscritos.setAdapter(adapter);
 
-        sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        carregarEventosInscritos();
+    }
 
-        listViewEventosInscritos.setOnItemClickListener((parent, view, position, id) -> {
-            Evento eventoSelecionado = eventosList.get(position);
+    private void carregarEventosInscritos() {
+        String uidUsuario = mAuth.getCurrentUser().getUid();
 
-            Intent intent = new Intent(eventosInscritos.this, DetalhesEventoActivity.class);
-            intent.putExtra("nomeEvento", eventoSelecionado.getNome());
-            intent.putExtra("dataInicio", eventoSelecionado.getDataInicio());
-            intent.putExtra("dataTermino", eventoSelecionado.getDataTermino());
-            intent.putExtra("endereco", eventoSelecionado.getEndereco());
-            intent.putExtra("descricao", eventoSelecionado.getDescricao());
-            intent.putExtra("qrCodeBase64", eventoSelecionado.getQrCodeBase64());
+        DatabaseReference userInscricoesRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(uidUsuario)
+                .child("eventos_inscritos");
 
-            startActivity(intent);
-        });
+        userInscricoesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> chavesEventos = new ArrayList<>();
 
-        // Se vier um evento novo do leitor, adiciona ele à lista salva
-        String eventoId = getIntent().getStringExtra("eventoId");
-        if (eventoId != null && !eventoId.isEmpty()) {
-            salvarEventoId(eventoId);
-        }
+                // Coleta todas as chaves de eventos inscritos
+                for (DataSnapshot inscricaoSnapshot : snapshot.getChildren()) {
+                    chavesEventos.add(inscricaoSnapshot.getKey());
+                }
 
-        // Carregar todos os eventos armazenados localmente
-        carregarEventosSalvos();
+                carregarDetalhesDosEventos(chavesEventos);
+            }
 
-        btnVoltar.setOnClickListener(v -> {
-            Intent intent = new Intent(eventosInscritos.this, tela_home.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
-            finish();
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(eventosInscritos.this,
+                        "Erro: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
         });
     }
 
-    // Salvar novo ID escaneado no SharedPreferences
-    private void salvarEventoId(String eventoId) {
-        Set<String> idsSalvos = sharedPreferences.getStringSet(EVENTOS_IDS_KEY, new HashSet<>());
-        Set<String> novosIds = new HashSet<>(idsSalvos);
-        novosIds.add(eventoId);
+    private void carregarDetalhesDosEventos(List<String> chavesEventos) {
+        DatabaseReference eventosRef = FirebaseDatabase.getInstance().getReference("eventos");
 
-        sharedPreferences.edit().putStringSet(EVENTOS_IDS_KEY, novosIds).apply();
-    }
+        eventosRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                eventosList.clear();
 
-    // Carrega todos os eventos já salvos
-    private void carregarEventosSalvos() {
-        Set<String> idsSalvos = sharedPreferences.getStringSet(EVENTOS_IDS_KEY, new HashSet<>());
-        if (idsSalvos.isEmpty()) {
-            Toast.makeText(this, "Você ainda não se inscreveu em nenhum evento", Toast.LENGTH_SHORT).show();
-            return;
-        }
+                for (String chaveComposta : chavesEventos) {
+                    String[] partes = chaveComposta.split("_");
+                    if (partes.length == 2) {
+                        String uidDono = partes[0];
+                        String eventoId = partes[1];
 
-        eventosList.clear();
-
-        for (String id : idsSalvos) {
-            DatabaseReference eventoRef = FirebaseDatabase.getInstance().getReference("eventos").child(id);
-            eventoRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    Evento evento = snapshot.getValue(Evento.class);
-                    if (evento != null) {
-                        eventosList.add(evento);
-                        adapter.notifyDataSetChanged();
+                        // Busca o evento específico
+                        DataSnapshot eventoSnapshot = snapshot.child(uidDono).child(eventoId);
+                        if (eventoSnapshot.exists()) {
+                            Evento evento = eventoSnapshot.getValue(Evento.class);
+                            if (evento != null) {
+                                eventosList.add(evento);
+                            }
+                        }
                     }
                 }
 
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(eventosInscritos.this, "Erro ao carregar evento", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
+                // Notifica o adapter que os dados mudaram
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(eventosInscritos.this,
+                        "Erro ao carregar eventos: " + error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 }
