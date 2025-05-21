@@ -45,11 +45,11 @@ public class eventosInscritos extends AppCompatActivity {
     }
 
     private void carregarEventosInscritos() {
-        String uidUsuario = mAuth.getCurrentUser().getUid();
+        String uid = mAuth.getCurrentUser().getUid();
 
         DatabaseReference userInscricoesRef = FirebaseDatabase.getInstance()
-                .getReference("users")
-                .child(uidUsuario)
+                .getReference("usuarios")
+                .child(uid)
                 .child("eventos_inscritos");
 
         userInscricoesRef.addListenerForSingleValueEvent(new ValueEventListener() {

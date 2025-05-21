@@ -142,7 +142,7 @@ public class ScanQRActivity extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 if (snapshot.exists()) {
-                    String id = snapshot.child("eventoId").getValue(String.class);
+                    String eventoId = snapshot.child("eventoId").getValue(String.class);
                     String nome = snapshot.child("nomeEvento").getValue(String.class);
                     String dataInicio = snapshot.child("dataHoraInicio").getValue(String.class);
                     String dataTermino = snapshot.child("dataHoraTermino").getValue(String.class);
