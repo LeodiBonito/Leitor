@@ -61,16 +61,18 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6f1544a8-5a33-47b2-8f0b-354f3e2f3c4c" name="Changes" comment=" banco de dados firebase &#10; leitor atualizado 3">
+    <list default="true" id="6f1544a8-5a33-47b2-8f0b-354f3e2f3c4c" name="Changes" comment=" banco de dados firebase &#10; leitor atualizado 4">
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/executionHistory/executionHistory.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/fileHashes.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/resourceHashesCache.bin" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/8.11.1/fileHashes/resourceHashesCache.bin" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/buildOutputCleanup/buildOutputCleanup.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gradle/file-system.probe" beforeDir="false" afterPath="$PROJECT_DIR$/.gradle/file-system.probe" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/TelaCadastro.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/TelaCadastro.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/TelaManutencaoEvento.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/TelaManutencaoEvento.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/meusEventos.java" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/java/com/example/leitor/meusEventos.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/src/main/res/layout/activity_tela_manutencao_evento.xml" beforeDir="false" afterPath="$PROJECT_DIR$/app/src/main/res/layout/activity_tela_manutencao_evento.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -80,7 +82,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=LocalEmulator, isTemplate=false, identifier=path=C:\Users\Leo\.android\avd\Medium_Phone.avd)]" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="device_and_snapshot_combo_box_target[DeviceId(pluginId=PhysicalDevice, isTemplate=false, identifier=serial=GCC1AQ04131206M9)]" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -302,7 +304,15 @@
       <option name="project" value="LOCAL" />
       <updated>1747839009218</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary=" banco de dados firebase &#10; leitor atualizado 4">
+      <option name="closed" value="true" />
+      <created>1747842493181</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1747842493181</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -324,7 +334,8 @@
     <MESSAGE value=" banco de dados firebase &#10; leitor atualizado 1" />
     <MESSAGE value=" banco de dados firebase &#10; leitor atualizado 2" />
     <MESSAGE value=" banco de dados firebase &#10; leitor atualizado 3" />
-    <option name="LAST_COMMIT_MESSAGE" value=" banco de dados firebase &#10; leitor atualizado 3" />
+    <MESSAGE value=" banco de dados firebase &#10; leitor atualizado 4" />
+    <option name="LAST_COMMIT_MESSAGE" value=" banco de dados firebase &#10; leitor atualizado 4" />
   </component>
   <component name="play_dynamic_filters_status">
     <option name="appIdToCheckInfo">

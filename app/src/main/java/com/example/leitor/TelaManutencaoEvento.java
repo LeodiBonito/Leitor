@@ -1,6 +1,7 @@
 package com.example.leitor;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -17,12 +18,18 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.UUID;
+import android.util.Base64;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.widget.ImageView;
 
 public class TelaManutencaoEvento extends AppCompatActivity {
 
     private EditText edtNome, edtDescricao, edtEndereco;
     private EditText edtDataInicio, edtDataTermino;
+    private ImageView imgQrCode;
     private Button btnAtualizar;
+    private Button btnExcluir, btnVoltar;
     private DatabaseReference databaseRef;
     private String uid;
     private Evento eventoEdicao;
@@ -46,7 +53,10 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         edtEndereco = findViewById(R.id.edtEndereco);
         edtDataInicio = findViewById(R.id.edtDataInicio);
         edtDataTermino = findViewById(R.id.edtDataTermino);
+        imgQrCode = findViewById(R.id.imgQrCode);
         btnAtualizar = findViewById(R.id.btnAtualizar);
+        btnExcluir = findViewById(R.id.btnExcluir);
+        btnVoltar = findViewById(R.id.btnVoltar);
 
         String eventoId = getIntent().getStringExtra("eventoId");
         if (eventoId != null) {
@@ -54,6 +64,10 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         }
 
         btnAtualizar.setOnClickListener(v -> salvarEvento());
+
+        btnExcluir.setOnClickListener(v -> excluirEvento());
+
+        btnVoltar.setOnClickListener(v -> finish());
     }
 
     private void carregarEventoParaEdicao(String eventoId) {
@@ -80,6 +94,16 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         edtEndereco.setText(evento.getEndereco());
         edtDataInicio.setText(evento.getDataInicio());
         edtDataTermino.setText(evento.getDataTermino());
+
+        // Exibir QR Code se estiver presente
+        if (evento.getQrCodeBase64() != null && !evento.getQrCodeBase64().isEmpty()) {
+            byte[] decodedBytes = Base64.decode(evento.getQrCodeBase64(), Base64.DEFAULT);
+            Bitmap qrBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+            imgQrCode.setImageBitmap(qrBitmap);
+            imgQrCode.setVisibility(View.VISIBLE);
+        } else {
+            imgQrCode.setVisibility(View.GONE);
+        }
     }
 
     private void salvarEvento() {
@@ -136,5 +160,21 @@ public class TelaManutencaoEvento extends AppCompatActivity {
             return false;
         }
         return true;
+    }
+
+    private void excluirEvento() {
+        if (eventoEdicao == null || eventoEdicao.getId() == null) {
+            Toast.makeText(this, "Nenhum evento selecionado para exclusão", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        databaseRef.child(eventoEdicao.getId()).removeValue()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Evento excluído com sucesso", Toast.LENGTH_SHORT).show();
+                    finish();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Erro ao excluir evento: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 }

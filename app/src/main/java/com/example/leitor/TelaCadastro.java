@@ -106,7 +106,7 @@ public class TelaCadastro extends AppCompatActivity {
                         if (signInMethods != null && !signInMethods.isEmpty()) {
                             // E-mail já cadastrado
                             Toast.makeText(TelaCadastro.this,
-                                    "Este e-mail já está cadastrado",
+                                    "O cadastro foi feito com sucesso!",
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             // 3. E-mail disponível - prossegue com cadastro

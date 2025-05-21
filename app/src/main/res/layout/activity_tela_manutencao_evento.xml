@@ -87,13 +87,13 @@
             android:layout_marginTop="16dp"/>
 
         <ImageView
-            android:id="@+id/imageViewQrCode"
+            android:id="@+id/imgQrCode"
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="8dp"
             android:contentDescription="QR Code do Evento"
-            android:scaleType="fitCenter"/>
+            android:scaleType="fitCenter" />
 
         <!-- Container dos botões Atualizar/Excluir -->
         <LinearLayout
