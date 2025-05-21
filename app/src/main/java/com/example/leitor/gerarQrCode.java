@@ -41,10 +41,12 @@ public class gerarQrCode extends AppCompatActivity {
             private boolean isFormatting;
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -161,7 +163,6 @@ public class gerarQrCode extends AppCompatActivity {
     }
 
     private void salvarEvento(String nomeEvento) {
-        // Recupera o ID que foi gerado para o QR Code
         String eventoId = (String) editTextNomeEvento.getTag();
 
         if (eventoId == null || eventoId.isEmpty()) {
@@ -169,17 +170,17 @@ public class gerarQrCode extends AppCompatActivity {
             return;
         }
 
-        // Obtém o UID do usuário logado
         String uid = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
         if (uid == null) {
             Toast.makeText(this, "Usuário não autenticado", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Referência do banco de dados no caminho do usuário
-        DatabaseReference eventosRef = FirebaseDatabase.getInstance().getReference("eventos").child(uid);
+        // 🔥 Referências no Firebase
+        DatabaseReference eventosPublicosRef = FirebaseDatabase.getInstance().getReference("eventosPublicos");
+        DatabaseReference eventosUsuarioRef = FirebaseDatabase.getInstance().getReference("eventos").child(uid);
 
-        // Converte o QR Code Bitmap para Base64
+        // 🔥 Converte QR Code para Base64
         String qrCodeBase64 = "";
         if (qrCodeBitmap != null) {
             try {
@@ -193,7 +194,6 @@ public class gerarQrCode extends AppCompatActivity {
             }
         }
 
-        // Cria objeto Evento
         Evento novoEvento = new Evento();
         novoEvento.setId(eventoId);
         novoEvento.setNome(nomeEvento);
@@ -203,24 +203,31 @@ public class gerarQrCode extends AppCompatActivity {
         novoEvento.setDescricao(editTextDescricao.getText().toString());
         novoEvento.setQrCodeBase64(qrCodeBase64);
 
-        // Salva no Firebase (dentro do nó do UID)
-        eventosRef.child(eventoId).setValue(novoEvento)
+        // 🔥 Salvar no banco público
+        eventosPublicosRef.child(eventoId).setValue(novoEvento)
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Evento e QR Code salvos com sucesso!", Toast.LENGTH_SHORT).show();
+                    // 🔥 Após salvar no público, salva também no usuário
+                    eventosUsuarioRef.child(eventoId).setValue(novoEvento)
+                            .addOnSuccessListener(aVoid2 -> {
+                                Toast.makeText(this, "Evento salvo com sucesso!", Toast.LENGTH_SHORT).show();
 
-                    // Limpa os campos após salvar
-                    editTextNomeEvento.setText("");
-                    editTextDataHoraInicio.setText("");
-                    editTextDataHoraTermino.setText("");
-                    editTextEndereco.setText("");
-                    editTextDescricao.setText("");
-                    imageViewQRCode.setImageBitmap(null);
-                    qrCodeBitmap = null;
-                    editTextNomeEvento.setTag(null);
+                                // Limpar os campos
+                                editTextNomeEvento.setText("");
+                                editTextDataHoraInicio.setText("");
+                                editTextDataHoraTermino.setText("");
+                                editTextEndereco.setText("");
+                                editTextDescricao.setText("");
+                                imageViewQRCode.setImageBitmap(null);
+                                qrCodeBitmap = null;
+                                editTextNomeEvento.setTag(null);
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(this, "Erro ao salvar no usuário: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Erro ao salvar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "Erro ao salvar no público: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
 }
