@@ -1,5 +1,6 @@
 package com.example.leitor;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -31,6 +32,7 @@ public class TelaManutencaoEvento extends AppCompatActivity {
     private ImageView imgQrCode;
     private Button btnAtualizar;
     private Button btnExcluir, btnVoltar;
+    private Button btnVerParticipantes;
     private DatabaseReference databaseRef;
     private DatabaseReference publicRef;
     private String uid;
@@ -50,6 +52,7 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         databaseRef = FirebaseDatabase.getInstance().getReference("eventos").child(uid);
         publicRef = FirebaseDatabase.getInstance().getReference("eventosPublicos");
 
+        btnVerParticipantes = findViewById(R.id.btnVerParticipantes);
         edtNome = findViewById(R.id.edtNomeEvento);
         edtDescricao = findViewById(R.id.edtDescricao);
         edtEndereco = findViewById(R.id.edtEndereco);
@@ -68,6 +71,15 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         btnAtualizar.setOnClickListener(v -> salvarEvento());
         btnExcluir.setOnClickListener(v -> excluirEvento());
         btnVoltar.setOnClickListener(v -> finish());
+        btnVerParticipantes.setOnClickListener(v -> {
+            if (eventoId != null && !eventoId.isEmpty()) {
+                Intent it = new Intent(TelaManutencaoEvento.this, ParticipantesEventoActivity.class);
+                it.putExtra("eventoId", eventoId);
+                startActivity(it);
+            } else {
+                Toast.makeText(this, "ID do evento não disponível", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void carregarEventoParaEdicao(String eventoId) {

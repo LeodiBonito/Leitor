@@ -28,14 +28,14 @@ public class DetalhesEventoActivity extends AppCompatActivity {
     private DatabaseReference eventoPublicoRef;
     private String eventoId;
     private ValueEventListener valueEventListener;
-    private Button btnVerParticipantes;
+    //private Button btnVerParticipantes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalhes_evento);
 
-        btnVerParticipantes = findViewById(R.id.btnVerParticipantes);
+        //btnVerParticipantes = findViewById(R.id.btnVerParticipantes);
 
         tvNome = findViewById(R.id.tvNome);
         tvDataInicio = findViewById(R.id.tvDataInicio);
@@ -62,7 +62,7 @@ public class DetalhesEventoActivity extends AppCompatActivity {
         }
 
         btnVoltar.setOnClickListener(v -> finish());
-        btnVerParticipantes.setOnClickListener(v -> {
+        /*btnVerParticipantes.setOnClickListener(v -> {
             if (eventoId != null && !eventoId.isEmpty()) {
                 Intent it = new Intent(DetalhesEventoActivity.this, ParticipantesEventoActivity.class);
                 it.putExtra("eventoId", eventoId);
@@ -70,7 +70,7 @@ public class DetalhesEventoActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "ID do evento não disponível", Toast.LENGTH_SHORT).show();
             }
-        });
+        });*/
 
     }
 

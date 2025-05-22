@@ -50,21 +50,21 @@
             android:layout_gravity="center"
             android:layout_marginTop="16dp" />
 
-        <Button
-            android:id="@+id/btnVerParticipantes"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:backgroundTint="#0D6EFD"
-            android:text="Ver Participantes" />
+        <!-- <Button
+             android:id="@+id/btnVerParticipantes"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginTop="16dp"
+             android:backgroundTint="#0D6EFD"
+             android:text="Ver Participantes" /> -->
 
-        <Button
-            android:id="@+id/btnVoltar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:backgroundTint="#0D6EFD"
-            android:text="Voltar" />
-    </LinearLayout>
-</ScrollView>
+         <Button
+             android:id="@+id/btnVoltar"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:backgroundTint="#0D6EFD"
+             android:text="Voltar" />
+     </LinearLayout>
+ </ScrollView>
 
 

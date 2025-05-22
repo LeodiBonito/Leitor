@@ -4,7 +4,8 @@ public class usuario {
     private String nome;
     private String email;
     private String uid;
-
+    private String horaEntrada;
+    private String horaSaida;
     public usuario() {
         // Construtor vazio necessário para o Firebase
     }
@@ -37,5 +38,21 @@ public class usuario {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public String getHoraEntrada() {
+        return horaEntrada;
+    }
+
+    public void setHoraEntrada(String horaEntrada) {
+        this.horaEntrada = horaEntrada;
+    }
+
+    public String getHoraSaida() {
+        return horaSaida;
+    }
+
+    public void setHoraSaida(String horaSaida) {
+        this.horaSaida = horaSaida;
     }
 }
