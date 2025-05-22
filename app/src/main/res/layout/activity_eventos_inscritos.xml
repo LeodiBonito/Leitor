@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -60,12 +61,12 @@
             android:layout_width="147dp"
             android:layout_height="38dp"
             android:layout_gravity="center"
-            android:backgroundTint="#009688"
+            android:backgroundTint="#0D6EFD"
             android:gravity="center"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:text="Voltar"
-            android:textColor="#050505" />
+            android:textColor="#F2ECEC" />
 
     </LinearLayout>
 </ScrollView>

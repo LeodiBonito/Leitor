@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -9,12 +10,14 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView android:id="@+id/tvNome"
-            android:textStyle="bold"
-            android:textSize="22sp"
+        <TextView
+            android:id="@+id/tvNome"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Nome do Evento" />
+            android:text="Nome do Evento"
+            android:textColor="#009688"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tvDataInicio"
@@ -46,17 +49,21 @@
             android:layout_height="200dp"
             android:layout_gravity="center"
             android:layout_marginTop="16dp" />
+
         <Button
             android:id="@+id/btnVerParticipantes"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ver Participantes"
-            android:layout_marginTop="16dp" />
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#0D6EFD"
+            android:text="Ver Participantes" />
+
         <Button
             android:id="@+id/btnVoltar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Voltar"/>
+            android:backgroundTint="#0D6EFD"
+            android:text="Voltar" />
     </LinearLayout>
 </ScrollView>
 

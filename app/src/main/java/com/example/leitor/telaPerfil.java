@@ -18,9 +18,8 @@ import com.google.firebase.database.FirebaseDatabase;
 public class telaPerfil extends AppCompatActivity {
 
     private ImageView imageViewPerfil;
-    private TextView txtEventosCriados, txtEventosParticipados, txtNome, txtEmail;
+    private TextView txtEventosCriados,txtNome, txtEmail;
     private Button btnVoltar, btnSair;
-
     private FirebaseAuth mAuth;
     private DatabaseReference databaseReference;
 
@@ -36,7 +35,6 @@ public class telaPerfil extends AppCompatActivity {
         // Vincula elementos da interface
 
         txtEventosCriados = findViewById(R.id.txtEventosCriados);
-        txtEventosParticipados = findViewById(R.id.txtEventosParticipados);
         txtNome = findViewById(R.id.txtNome);
         txtEmail = findViewById(R.id.txtEmail);
         btnVoltar = findViewById(R.id.btnVoltar);
@@ -68,7 +66,6 @@ public class telaPerfil extends AppCompatActivity {
                     txtEmail.setText(email != null ? email : "Email não encontrado");
 
                     txtEventosCriados.setText(eventosCriados != null ? String.valueOf(eventosCriados) : "0");
-                    txtEventosParticipados.setText(eventosParticipados != null ? String.valueOf(eventosParticipados) : "0");
 
                 } else {
                     Toast.makeText(telaPerfil.this, "Usuário não encontrado no banco de dados", Toast.LENGTH_SHORT).show();

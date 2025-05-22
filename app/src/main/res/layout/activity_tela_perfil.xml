@@ -4,17 +4,18 @@
     android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FAFAFA">
+    android:background="#FAFAFA"
+    android:fitsSystemWindows="true">
 
     <TextView
         android:id="@+id/txtEstatisticas"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Minhas Estatísticas"
-        android:textStyle="bold"
-        android:textSize="18sp"
         android:layout_gravity="center"
-        />
+        android:text="Minhas Estatísticas"
+        android:textColor="#009688"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/txtNome"
@@ -54,31 +55,16 @@
             android:text="Eventos Criados"
             android:padding="8dp"/>
 
-        <TextView
-            android:id="@+id/txtEventosParticipados"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="24"
-            android:textColor="#0000FF"
-            android:textSize="20sp"
-            android:padding="8dp"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Eventos Participados"
-            android:padding="8dp"/>
-
     </LinearLayout>
 
     <Button
         android:id="@+id/btnVoltar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="#0D6EFD"
         android:text="Voltar"
-        android:backgroundTint="#00BFA5"
-        android:textColor="#FFFFFF"
-        android:layout_marginTop="20dp"/>
+        android:textColor="#FFFFFF" />
 
     <Button
         android:id="@+id/btnSair"

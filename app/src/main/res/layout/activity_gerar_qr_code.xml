@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F8F8F8"
-    android:padding="24dp">
+    android:padding="24dp"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,11 +18,11 @@
             android:id="@+id/textViewTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Gerar QR Code"
-            android:textSize="20sp"
-            android:textStyle="bold"
             android:layout_marginBottom="24dp"
-            android:textColor="#000000" />
+            android:text="Gerar QR Code"
+            android:textColor="#009688"
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <EditText
             android:id="@+id/editTextNomeEvento"
@@ -100,36 +101,34 @@
             android:layout_gravity="center"
             android:contentDescription="QR Code" />
 
-        <TableRow
+        <!-- Botões corrigidos -->
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="24dp">
 
             <Button
                 android:id="@+id/btnSalvar"
-                android:layout_width="158dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
                 android:backgroundTint="#009688"
-                android:gravity="center"
-                android:paddingStart="16dp"
-
-                android:paddingEnd="16dp"
                 android:text="Salvar"
-                android:textColor="#050505" />
+                android:textColor="#F0F0F0" />
 
             <Button
                 android:id="@+id/btnVoltar"
-                android:layout_width="158dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-
+                android:layout_marginStart="8dp"
+                android:layout_weight="1"
                 android:backgroundTint="#009688"
-                android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp"
                 android:text="Voltar"
-                android:textColor="#050505" />
-        </TableRow>
-
+                android:textColor="#F8F5F5" />
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>
