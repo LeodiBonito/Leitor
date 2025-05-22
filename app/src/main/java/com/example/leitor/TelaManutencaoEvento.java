@@ -1,6 +1,7 @@
 package com.example.leitor;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,6 +32,7 @@ public class TelaManutencaoEvento extends AppCompatActivity {
     private Button btnAtualizar;
     private Button btnExcluir, btnVoltar;
     private DatabaseReference databaseRef;
+    private DatabaseReference publicRef;
     private String uid;
     private Evento eventoEdicao;
 
@@ -39,7 +41,6 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tela_manutencao_evento);
 
-        // Recupera UID passado por outra tela
         uid = getIntent().getStringExtra("uid");
         if (uid == null) {
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -47,6 +48,7 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         }
 
         databaseRef = FirebaseDatabase.getInstance().getReference("eventos").child(uid);
+        publicRef = FirebaseDatabase.getInstance().getReference("eventosPublicos");
 
         edtNome = findViewById(R.id.edtNomeEvento);
         edtDescricao = findViewById(R.id.edtDescricao);
@@ -64,9 +66,7 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         }
 
         btnAtualizar.setOnClickListener(v -> salvarEvento());
-
         btnExcluir.setOnClickListener(v -> excluirEvento());
-
         btnVoltar.setOnClickListener(v -> finish());
     }
 
@@ -95,12 +95,16 @@ public class TelaManutencaoEvento extends AppCompatActivity {
         edtDataInicio.setText(evento.getDataInicio());
         edtDataTermino.setText(evento.getDataTermino());
 
-        // Exibir QR Code se estiver presente
         if (evento.getQrCodeBase64() != null && !evento.getQrCodeBase64().isEmpty()) {
-            byte[] decodedBytes = Base64.decode(evento.getQrCodeBase64(), Base64.DEFAULT);
-            Bitmap qrBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-            imgQrCode.setImageBitmap(qrBitmap);
-            imgQrCode.setVisibility(View.VISIBLE);
+            try {
+                byte[] decodedBytes = Base64.decode(evento.getQrCodeBase64(), Base64.DEFAULT);
+                Bitmap qrBitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                imgQrCode.setImageBitmap(qrBitmap);
+                imgQrCode.setVisibility(View.VISIBLE);
+            } catch (IllegalArgumentException e) {
+                Log.e("QR_CODE", "Erro ao decodificar QR Code", e);
+                imgQrCode.setVisibility(View.GONE);
+            }
         } else {
             imgQrCode.setVisibility(View.GONE);
         }
@@ -124,7 +128,6 @@ public class TelaManutencaoEvento extends AppCompatActivity {
                 evento.setEndereco(endereco);
                 evento.setDataInicio(dataInicio);
                 evento.setDataTermino(dataTermino);
-                // Mantém o QR code já existente
                 if (evento.getQrCodeBase64() == null) {
                     evento.setQrCodeBase64(qrCodeBase64);
                 }
@@ -134,16 +137,52 @@ public class TelaManutencaoEvento extends AppCompatActivity {
                 evento.setId(id);
             }
 
-            // Salva no caminho correto: eventos/{uid}/{eventoId}
+            // Salvar no nó do usuário
             databaseRef.child(evento.getId()).setValue(evento)
                     .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Evento salvo com sucesso!", Toast.LENGTH_SHORT).show();
-                        finish();
+                        // Salvar no nó público
+                        publicRef.child(evento.getId()).setValue(evento)
+                                .addOnSuccessListener(aVoid1 -> {
+                                    // Atualizar nas inscrições de todos os usuários
+                                    atualizarEventoNosInscritos(evento);
+                                    Toast.makeText(TelaManutencaoEvento.this, "Evento salvo com sucesso!", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(TelaManutencaoEvento.this, "Erro ao salvar evento público", Toast.LENGTH_SHORT).show();
+                                });
                     })
                     .addOnFailureListener(e -> {
-                        Toast.makeText(this, "Erro ao salvar evento: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TelaManutencaoEvento.this, "Erro ao salvar evento", Toast.LENGTH_SHORT).show();
                     });
         }
+    }
+
+    private void atualizarEventoNosInscritos(Evento eventoAtualizado) {
+        DatabaseReference inscricoesRef = FirebaseDatabase.getInstance()
+                .getReference("usuarios");
+
+        inscricoesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                    if (userSnapshot.hasChild("inscricaoEvento/" + eventoAtualizado.getId())) {
+                        userSnapshot.child("inscricaoEvento")
+                                .child(eventoAtualizado.getId())
+                                .getRef()
+                                .setValue(eventoAtualizado)
+                                .addOnFailureListener(e -> {
+                                    Log.e("UPDATE_EVENT", "Erro ao atualizar inscrição: " + e.getMessage());
+                                });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("UPDATE_EVENT", "Erro ao atualizar inscrições: " + error.getMessage());
+            }
+        });
     }
 
     private boolean validarCampos(String nome, String dataInicio, String dataTermino) {
@@ -170,11 +209,45 @@ public class TelaManutencaoEvento extends AppCompatActivity {
 
         databaseRef.child(eventoEdicao.getId()).removeValue()
                 .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(this, "Evento excluído com sucesso", Toast.LENGTH_SHORT).show();
-                    finish();
+                    publicRef.child(eventoEdicao.getId()).removeValue()
+                            .addOnSuccessListener(aVoid1 -> {
+                                removerEventoDasInscricoes(eventoEdicao.getId());
+                                Toast.makeText(TelaManutencaoEvento.this, "Evento excluído com sucesso", Toast.LENGTH_SHORT).show();
+                                finish();
+                            })
+                            .addOnFailureListener(e -> {
+                                Toast.makeText(TelaManutencaoEvento.this, "Erro ao excluir evento público", Toast.LENGTH_SHORT).show();
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Erro ao excluir evento: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TelaManutencaoEvento.this, "Erro ao excluir evento", Toast.LENGTH_SHORT).show();
                 });
+    }
+
+    private void removerEventoDasInscricoes(String eventoId) {
+        DatabaseReference inscricoesRef = FirebaseDatabase.getInstance()
+                .getReference("usuarios");
+
+        inscricoesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                    if (userSnapshot.hasChild("inscricaoEvento/" + eventoId)) {
+                        userSnapshot.child("inscricaoEvento")
+                                .child(eventoId)
+                                .getRef()
+                                .removeValue()
+                                .addOnFailureListener(e -> {
+                                    Log.e("REMOVE_EVENT", "Erro ao remover inscrição: " + e.getMessage());
+                                });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("REMOVE_EVENT", "Erro ao remover inscrições: " + error.getMessage());
+            }
+        });
     }
 }

@@ -1,5 +1,6 @@
 package com.example.leitor;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -7,15 +8,26 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class DetalhesEventoActivity extends AppCompatActivity {
 
     private TextView tvNome, tvDataInicio, tvDataTermino, tvEndereco, tvDescricao;
     private ImageView imageQrCode;
     private Button btnVoltar;
+    private DatabaseReference eventoPublicoRef;
+    private String eventoId;
+    private ValueEventListener valueEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +42,6 @@ public class DetalhesEventoActivity extends AppCompatActivity {
         imageQrCode = findViewById(R.id.imageQRCode);
         btnVoltar = findViewById(R.id.btnVoltar);
 
-        // 🔄 Recuperar dados passados pela Intent
         Intent intent = getIntent();
         String nome = intent.getStringExtra("nome");
         String dataInicio = intent.getStringExtra("dataInicio");
@@ -38,21 +49,79 @@ public class DetalhesEventoActivity extends AppCompatActivity {
         String endereco = intent.getStringExtra("endereco");
         String descricao = intent.getStringExtra("descricao");
         String qrCodeBase64 = intent.getStringExtra("qrCodeBase64");
+        eventoId = intent.getStringExtra("eventoId");
 
-        // 📝 Mostrar os dados nos TextViews
+        mostrarDadosEvento(nome, dataInicio, dataTermino, endereco, descricao, qrCodeBase64);
+
+        if (eventoId != null && !eventoId.isEmpty()) {
+            configurarListenerAtualizacoes();
+        }
+
+        btnVoltar.setOnClickListener(v -> finish());
+    }
+
+    private void mostrarDadosEvento(String nome, String dataInicio, String dataTermino,
+                                    String endereco, String descricao, String qrCodeBase64) {
         tvNome.setText("Nome: " + nome);
         tvDataInicio.setText("Início: " + dataInicio);
         tvDataTermino.setText("Término: " + dataTermino);
         tvEndereco.setText("Endereço: " + endereco);
         tvDescricao.setText("Descrição: " + descricao);
 
-        // 📷 Decodificar o QR Code e mostrar na ImageView
         if (qrCodeBase64 != null && !qrCodeBase64.isEmpty()) {
-            byte[] decodedBytes = Base64.decode(qrCodeBase64, Base64.DEFAULT);
-            Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
-            imageQrCode.setImageBitmap(bitmap);
+            try {
+                byte[] decodedBytes = Base64.decode(qrCodeBase64, Base64.DEFAULT);
+                Bitmap bitmap = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+                imageQrCode.setImageBitmap(bitmap);
+            } catch (IllegalArgumentException e) {
+                Log.e("QR_CODE", "Erro ao decodificar QR Code", e);
+            }
         }
+    }
 
-        btnVoltar.setOnClickListener(v -> finish());
+    private void configurarListenerAtualizacoes() {
+        eventoPublicoRef = FirebaseDatabase.getInstance().getReference("eventosPublicos").child(eventoId);
+
+        valueEventListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (!snapshot.exists()) {
+                    Toast.makeText(DetalhesEventoActivity.this,
+                            "Este evento foi removido pelo organizador",
+                            Toast.LENGTH_LONG).show();
+                    finish();
+                    return;
+                }
+
+                Evento eventoAtualizado = snapshot.getValue(Evento.class);
+                if (eventoAtualizado != null) {
+                    mostrarDadosEvento(
+                            eventoAtualizado.getNome(),
+                            eventoAtualizado.getDataInicio(),
+                            eventoAtualizado.getDataTermino(),
+                            eventoAtualizado.getEndereco(),
+                            eventoAtualizado.getDescricao(),
+                            eventoAtualizado.getQrCodeBase64()
+                    );
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(DetalhesEventoActivity.this,
+                        "Erro ao verificar atualizações",
+                        Toast.LENGTH_SHORT).show();
+            }
+        };
+
+        eventoPublicoRef.addValueEventListener(valueEventListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (eventoPublicoRef != null && valueEventListener != null) {
+            eventoPublicoRef.removeEventListener(valueEventListener);
+        }
     }
 }

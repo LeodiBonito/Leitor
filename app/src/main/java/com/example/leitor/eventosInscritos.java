@@ -5,7 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.AdapterView;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -27,6 +27,8 @@ public class eventosInscritos extends AppCompatActivity {
     private List<Evento> eventosList = new ArrayList<>();
     private FirebaseAuth mAuth;
     private Button btnVoltar;
+    private DatabaseReference eventosRef;
+    private ValueEventListener valueEventListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +46,6 @@ public class eventosInscritos extends AppCompatActivity {
 
         carregarEventosInscritos();
 
-        // 👉 Clique no item da lista para abrir tela de detalhes
         listViewEventosInscritos.setOnItemClickListener((parent, view, position, id) -> {
             Evento eventoSelecionado = eventosList.get(position);
 
@@ -55,6 +56,7 @@ public class eventosInscritos extends AppCompatActivity {
             intent.putExtra("endereco", eventoSelecionado.getEndereco());
             intent.putExtra("descricao", eventoSelecionado.getDescricao());
             intent.putExtra("qrCodeBase64", eventoSelecionado.getQrCodeBase64());
+            intent.putExtra("eventoId", eventoSelecionado.getId());
 
             startActivity(intent);
         });
@@ -62,13 +64,17 @@ public class eventosInscritos extends AppCompatActivity {
 
     private void carregarEventosInscritos() {
         String uid = mAuth.getCurrentUser().getUid();
+        if (uid == null) {
+            Toast.makeText(this, "Usuário não autenticado", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        DatabaseReference eventosRef = FirebaseDatabase.getInstance()
+        eventosRef = FirebaseDatabase.getInstance()
                 .getReference("usuarios")
                 .child(uid)
                 .child("inscricaoEvento");
 
-        eventosRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        valueEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 eventosList.clear();
@@ -94,6 +100,16 @@ public class eventosInscritos extends AppCompatActivity {
                         "Erro: " + error.getMessage(),
                         Toast.LENGTH_SHORT).show();
             }
-        });
+        };
+
+        eventosRef.addValueEventListener(valueEventListener);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (eventosRef != null && valueEventListener != null) {
+            eventosRef.removeEventListener(valueEventListener);
+        }
     }
 }
