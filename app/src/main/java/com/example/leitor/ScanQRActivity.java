@@ -29,6 +29,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class ScanQRActivity extends AppCompatActivity {
 
@@ -108,7 +111,7 @@ public class ScanQRActivity extends AppCompatActivity {
                 if (qrCodes.size() > 0 && !isProcessing) {
                     isProcessing = true;
 
-                    final String eventoId = qrCodes.valueAt(0).displayValue.trim(); // ✔️ Agora QR só tem eventoId
+                    final String eventoId = qrCodes.valueAt(0).displayValue.trim(); // ✔️ QR com ID do evento
 
                     if (!eventoId.isEmpty()) {
                         salvarEventoInscrito(eventoId);
@@ -131,58 +134,89 @@ public class ScanQRActivity extends AppCompatActivity {
         }
 
         String uid = user.getUid();
-
-        // 🔥 Busca evento no nó eventosPublicos
-        DatabaseReference eventoRef = FirebaseDatabase.getInstance()
-                .getReference("eventosPublicos")
+        DatabaseReference userRef = FirebaseDatabase.getInstance()
+                .getReference("usuarios")
+                .child(uid)
+                .child("inscricaoEvento")
                 .child(eventoId);
 
-        eventoRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                String currentTime = new SimpleDateFormat("HH:mm:ss", Locale.getDefault()).format(new Date());
+
                 if (snapshot.exists()) {
-                    String nome = snapshot.child("nome").getValue(String.class);
-                    String dataInicio = snapshot.child("dataInicio").getValue(String.class);
-                    String dataTermino = snapshot.child("dataTermino").getValue(String.class);
-                    String endereco = snapshot.child("endereco").getValue(String.class);
-                    String descricao = snapshot.child("descricao").getValue(String.class);
-                    String qrCodeBase64 = snapshot.child("qrCodeBase64").getValue(String.class);
-
-                    Evento evento = new Evento();
-                    evento.setId(eventoId);
-                    evento.setNome(nome);
-                    evento.setDataInicio(dataInicio);
-                    evento.setDataTermino(dataTermino);
-                    evento.setEndereco(endereco);
-                    evento.setDescricao(descricao);
-                    evento.setQrCodeBase64(qrCodeBase64);
-
-                    // ✔️ Salvar na inscrição do usuário
-                    DatabaseReference inscritoRef = FirebaseDatabase.getInstance()
-                            .getReference("usuarios")
-                            .child(uid)
-                            .child("inscricaoEvento")
-                            .child(eventoId);
-
-                    inscritoRef.setValue(evento).addOnCompleteListener(task -> {
+                    // Já está inscrito → atualiza hora de saída
+                    userRef.child("horaSaida").setValue(currentTime).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             runOnUiThread(() -> {
-                                Toast.makeText(ScanQRActivity.this, "Inscrição realizada com sucesso!", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(ScanQRActivity.this, eventosInscritos.class);
-                                startActivity(intent);
+                                Toast.makeText(ScanQRActivity.this, "Saída registrada!", Toast.LENGTH_SHORT).show();
                                 finish();
                             });
                         } else {
                             runOnUiThread(() -> {
-                                Toast.makeText(ScanQRActivity.this, "Erro ao salvar inscrição", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ScanQRActivity.this, "Erro ao registrar saída", Toast.LENGTH_SHORT).show();
                                 isProcessing = false;
                             });
                         }
                     });
                 } else {
-                    runOnUiThread(() -> {
-                        Toast.makeText(ScanQRActivity.this, "Evento não encontrado", Toast.LENGTH_SHORT).show();
-                        isProcessing = false;
+                    // 🔥 Busca evento em eventosPublicos para registrar inscrição nova com hora de entrada
+                    DatabaseReference eventoRef = FirebaseDatabase.getInstance()
+                            .getReference("eventosPublicos")
+                            .child(eventoId);
+
+                    eventoRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                String nome = snapshot.child("nome").getValue(String.class);
+                                String dataInicio = snapshot.child("dataInicio").getValue(String.class);
+                                String dataTermino = snapshot.child("dataTermino").getValue(String.class);
+                                String endereco = snapshot.child("endereco").getValue(String.class);
+                                String descricao = snapshot.child("descricao").getValue(String.class);
+                                String qrCodeBase64 = snapshot.child("qrCodeBase64").getValue(String.class);
+
+                                Evento evento = new Evento();
+                                evento.setId(eventoId);
+                                evento.setNome(nome);
+                                evento.setDataInicio(dataInicio);
+                                evento.setDataTermino(dataTermino);
+                                evento.setEndereco(endereco);
+                                evento.setDescricao(descricao);
+                                evento.setQrCodeBase64(qrCodeBase64);
+
+                                userRef.setValue(evento).addOnCompleteListener(task -> {
+                                    if (task.isSuccessful()) {
+                                        userRef.child("horaEntrada").setValue(currentTime);
+                                        runOnUiThread(() -> {
+                                            Toast.makeText(ScanQRActivity.this, "Entrada registrada com sucesso!", Toast.LENGTH_SHORT).show();
+                                            Intent intent = new Intent(ScanQRActivity.this, eventosInscritos.class);
+                                            startActivity(intent);
+                                            finish();
+                                        });
+                                    } else {
+                                        runOnUiThread(() -> {
+                                            Toast.makeText(ScanQRActivity.this, "Erro ao salvar inscrição", Toast.LENGTH_SHORT).show();
+                                            isProcessing = false;
+                                        });
+                                    }
+                                });
+                            } else {
+                                runOnUiThread(() -> {
+                                    Toast.makeText(ScanQRActivity.this, "Evento não encontrado", Toast.LENGTH_SHORT).show();
+                                    isProcessing = false;
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            runOnUiThread(() -> {
+                                Toast.makeText(ScanQRActivity.this, "Erro ao acessar dados do evento", Toast.LENGTH_SHORT).show();
+                                isProcessing = false;
+                            });
+                        }
                     });
                 }
             }
@@ -190,11 +224,10 @@ public class ScanQRActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 runOnUiThread(() -> {
-                    Toast.makeText(ScanQRActivity.this, "Erro ao acessar dados do evento", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ScanQRActivity.this, "Erro ao verificar inscrição", Toast.LENGTH_SHORT).show();
                     isProcessing = false;
                 });
             }
         });
     }
-
 }

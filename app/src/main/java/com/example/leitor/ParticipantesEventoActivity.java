@@ -1,13 +1,13 @@
 package com.example.leitor;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.leitor.ParticipanteAdapter;
+import com.example.leitor.R;
+import com.example.leitor.usuario;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -20,13 +20,10 @@ import java.util.List;
 public class ParticipantesEventoActivity extends AppCompatActivity {
 
     private ListView listViewParticipantes;
-    private ParticipanteAdapter participanteAdapter;  // Adapter que criaremos para mostrar os participantes
-    private List<usuario> participantesList = new ArrayList<>();
-    private DatabaseReference usuariosRef;
-    private ValueEventListener usuariosListener;
-    private Button btnVoltar;
+    private List<usuario> listaParticipantes;
+    private ParticipanteAdapter adapter;
 
-    private String eventoId;
+    private DatabaseReference participantesRef;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,70 +31,55 @@ public class ParticipantesEventoActivity extends AppCompatActivity {
         setContentView(R.layout.activity_participantes_evento);
 
         listViewParticipantes = findViewById(R.id.listViewParticipantes);
-        Button btnVoltar = findViewById(R.id.btnVoltar);
-        btnVoltar.setOnClickListener(v -> finish());
+        listaParticipantes = new ArrayList<>();
+        adapter = new ParticipanteAdapter(this, listaParticipantes);
+        listViewParticipantes.setAdapter(adapter);
 
-        // Pega o eventoId passado pela Intent
-        eventoId = getIntent().getStringExtra("eventoId");
-        if (eventoId == null || eventoId.isEmpty()) {
-            Toast.makeText(this, "ID do evento não fornecido", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
+        // Recebe o ID do evento enviado pela tela anterior
+        String eventoId = getIntent().getStringExtra("eventoId");
+
+        if (eventoId != null) {
+            participantesRef = FirebaseDatabase.getInstance().getReference("usuarios");
+            carregarParticipantes(eventoId);
+        } else {
+            Toast.makeText(this, "ID do evento não encontrado", Toast.LENGTH_SHORT).show();
         }
-
-        participanteAdapter = new ParticipanteAdapter(this, participantesList);
-        listViewParticipantes.setAdapter(participanteAdapter);
-
-        carregarParticipantes();
     }
 
-    private void carregarParticipantes() {
-        usuariosRef = FirebaseDatabase.getInstance().getReference("usuarios");
-
-        usuariosListener = new ValueEventListener() {
+    private void carregarParticipantes(String eventoId) {
+        participantesRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                participantesList.clear();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                listaParticipantes.clear();
+                for (DataSnapshot usuarioSnapshot : dataSnapshot.getChildren()) {
+                    String uid = usuarioSnapshot.getKey();
+                    String nome = usuarioSnapshot.child("nome").getValue(String.class);
+                    String email = usuarioSnapshot.child("email").getValue(String.class);
 
-                for (DataSnapshot usuarioSnapshot : snapshot.getChildren()) {
-                    // Verifica se o usuário está inscrito nesse evento
+                    // Verifica se o usuário está inscrito no evento
                     DataSnapshot inscricaoEventoSnapshot = usuarioSnapshot.child("inscricaoEvento").child(eventoId);
                     if (inscricaoEventoSnapshot.exists()) {
-                        String nome = usuarioSnapshot.child("nome").getValue(String.class);
-                        String email = usuarioSnapshot.child("email").getValue(String.class);
-                        String uid = usuarioSnapshot.getKey();
+                        String horaEntrada = inscricaoEventoSnapshot.child("horaEntrada").getValue(String.class);
+                        String horaSaida = inscricaoEventoSnapshot.child("horaSaida").getValue(String.class);
 
                         usuario usuario = new usuario();
+                        usuario.setUid(uid);
                         usuario.setNome(nome);
                         usuario.setEmail(email);
-                        usuario.setUid(uid);
+                        usuario.setHoraEntrada(horaEntrada);
+                        usuario.setHoraSaida(horaSaida);
 
-                        participantesList.add(usuario);
+                        listaParticipantes.add(usuario);
                     }
                 }
 
-                if (participantesList.isEmpty()) {
-                    Toast.makeText(ParticipantesEventoActivity.this, "Nenhum participante encontrado.", Toast.LENGTH_SHORT).show();
-                }
-                participanteAdapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(ParticipantesEventoActivity.this,
-                        "Erro ao carregar participantes: " + error.getMessage(),
-                        Toast.LENGTH_SHORT).show();
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(ParticipantesEventoActivity.this, "Erro ao carregar participantes", Toast.LENGTH_SHORT).show();
             }
-        };
-
-        usuariosRef.addValueEventListener(usuariosListener);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (usuariosRef != null && usuariosListener != null) {
-            usuariosRef.removeEventListener(usuariosListener);
-        }
+        });
     }
 }
