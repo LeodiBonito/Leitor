@@ -28,11 +28,14 @@ public class DetalhesEventoActivity extends AppCompatActivity {
     private DatabaseReference eventoPublicoRef;
     private String eventoId;
     private ValueEventListener valueEventListener;
+    private Button btnVerParticipantes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detalhes_evento);
+
+        btnVerParticipantes = findViewById(R.id.btnVerParticipantes);
 
         tvNome = findViewById(R.id.tvNome);
         tvDataInicio = findViewById(R.id.tvDataInicio);
@@ -41,6 +44,7 @@ public class DetalhesEventoActivity extends AppCompatActivity {
         tvDescricao = findViewById(R.id.tvDescricao);
         imageQrCode = findViewById(R.id.imageQRCode);
         btnVoltar = findViewById(R.id.btnVoltar);
+
 
         Intent intent = getIntent();
         String nome = intent.getStringExtra("nome");
@@ -58,7 +62,18 @@ public class DetalhesEventoActivity extends AppCompatActivity {
         }
 
         btnVoltar.setOnClickListener(v -> finish());
+        btnVerParticipantes.setOnClickListener(v -> {
+            if (eventoId != null && !eventoId.isEmpty()) {
+                Intent it = new Intent(DetalhesEventoActivity.this, ParticipantesEventoActivity.class);
+                it.putExtra("eventoId", eventoId);
+                startActivity(it);
+            } else {
+                Toast.makeText(this, "ID do evento não disponível", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
+
 
     private void mostrarDadosEvento(String nome, String dataInicio, String dataTermino,
                                     String endereco, String descricao, String qrCodeBase64) {

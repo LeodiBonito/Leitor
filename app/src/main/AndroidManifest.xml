@@ -25,6 +25,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".ParticipantesEventoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".telaListaParticipantes"
+            android:exported="false" />
+        <activity
             android:name=".telaPerfil"
             android:exported="false" />
         <activity

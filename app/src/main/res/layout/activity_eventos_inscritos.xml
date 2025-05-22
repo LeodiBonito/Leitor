@@ -36,7 +36,7 @@
         <ListView
             android:id="@+id/listViewEventosInscritos"
             android:layout_width="match_parent"
-            android:layout_height="577dp"
+            android:layout_height="413dp"
             android:divider="#000000"
             android:dividerHeight="2dp"
             android:nestedScrollingEnabled="true"
@@ -66,7 +66,6 @@
             android:paddingEnd="16dp"
             android:text="Voltar"
             android:textColor="#050505" />
-
 
     </LinearLayout>
 </ScrollView>

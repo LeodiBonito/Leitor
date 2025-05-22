@@ -46,6 +46,7 @@ public class eventosInscritos extends AppCompatActivity {
 
         carregarEventosInscritos();
 
+
         listViewEventosInscritos.setOnItemClickListener((parent, view, position, id) -> {
             Evento eventoSelecionado = eventosList.get(position);
 

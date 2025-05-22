@@ -16,27 +16,41 @@
             android:layout_height="wrap_content"
             android:text="Nome do Evento" />
 
-        <TextView android:id="@+id/tvDataInicio"
+        <TextView
+            android:id="@+id/tvDataInicio"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="#000000" />
 
-        <TextView android:id="@+id/tvDataTermino"
+        <TextView
+            android:id="@+id/tvDataTermino"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="#000000" />
 
-        <TextView android:id="@+id/tvEndereco"
+        <TextView
+            android:id="@+id/tvEndereco"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="#000000" />
 
-        <TextView android:id="@+id/tvDescricao"
+        <TextView
+            android:id="@+id/tvDescricao"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textColor="#000000" />
 
         <ImageView
             android:id="@+id/imageQRCode"
             android:layout_width="200dp"
             android:layout_height="200dp"
             android:layout_gravity="center"
+            android:layout_marginTop="16dp" />
+        <Button
+            android:id="@+id/btnVerParticipantes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ver Participantes"
             android:layout_marginTop="16dp" />
         <Button
             android:id="@+id/btnVoltar"
